@@ -2,14 +2,14 @@ version: 2
 jobs:
   build:
     docker:
-      - image: debian:stretch
+      - image: debian:buster
 
     steps:
       - checkout
 
       - run:
           name: Build Tool Setup (conan)
-          command: pip3 install conan
+          command: pip install conan
       
       - run:
           name: Conan Install 3rd Party Dependencies
