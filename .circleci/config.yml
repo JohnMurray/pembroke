@@ -8,8 +8,12 @@ jobs:
       - checkout
 
       - run:
+          name: Python Install
+          command: apt-get install python pip
+
+      - run:
           name: Build Tool Setup (conan)
-          command: pip3 install conan
+          command: pip install conan
       
       - run:
           name: Conan Install 3rd Party Dependencies
