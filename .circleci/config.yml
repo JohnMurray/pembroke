@@ -9,7 +9,7 @@ jobs:
 
       - run:
           name: Build Tool Setup (conan)
-          command: pip install conan
+          command: pip3 install conan
       
       - run:
           name: Conan Install 3rd Party Dependencies
