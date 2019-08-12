@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:stretch
+
+    steps:
+      - checkout
+
+      - run:
+          name: Build Tool Setup (conan)
+          command: pip3 install conan
+      
+      - run:
+          name: Conan Install 3rd Party Dependencies
+          command: mkdir build && cd build && conan install ..
+      
+      - run:
+          name: CMake Setup
+          command: cd build && cmake ..
+      
+      - run:
+          name: Compile
+          command: cd build && make
+      
+      - run:
+          name: CTest
+          command: cd build && make test
