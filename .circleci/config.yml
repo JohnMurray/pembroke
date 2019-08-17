@@ -20,10 +20,6 @@ jobs:
           command: pip3 install conan && conan config get
       
       - run:
-          name: Build Tool Setup (clang)
-          command: apt-get install -y clang-8
-      
-      - run:
           name: Conan Install 3rd Party Dependencies
           command: mkdir build && cd build && conan install ..
       
