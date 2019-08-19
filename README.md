@@ -27,4 +27,4 @@ in production code I would love to hear about your experience.
 See [LICENSE.txt][license_file] for more details.
 
   [libevent_homepage]: https://libevent.org/
-  [license_file]: ./blob/master/LICENSE.txt
+  [license_file]: ./LICENSE.txt
