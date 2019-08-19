@@ -24,6 +24,7 @@ The end-state for the project should ideally meet the following criteria.
 This project is licensed under the permissive MIT license, but if you find this code useful and have used it
 in production code I would love to hear about your experience. 
 
-See LICENSE.txt for more details.
+See [LICENSE.txt][license_file] for more details.
 
   [libevent_homepage]: https://libevent.org/
+  [license_file]: ./blob/master/LICENSE.txt
