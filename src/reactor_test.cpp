@@ -44,3 +44,34 @@ TEST_CASE("Reactor features-toggles", "[reactor][smoke]") {
         CHECK_FALSE(builder.m_require_order_one_trigger);
     }
 }
+
+TEST_CASE("Reactor runs with no scheduled events", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    REQUIRE_NOTHROW(r->run_non_blocking());
+}
+
+TEST_CASE("Reactor resumes post-run, repeatedly", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    r->run_non_blocking();
+
+    CHECK(r->resume());
+    CHECK(r->resume());
+    CHECK(r->resume());
+}
+
+TEST_CASE("Reactor pauses post-run, repeatedly", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    r->run_non_blocking();
+
+    CHECK(r->pause());
+    CHECK(r->pause());
+    CHECK(r->pause());
+}
+
+// TODO: Using tasks, validate the behavior:
+//       - pause()             - Ensure pause actually pauses a reactor from within a task
+//       - resume()            - Ensure resume actually resumes from a paused task (paused from a task)
+//                             - Ensure pending tasks are run on resume (that were scheduled during a pause)
+//       - run_non_blocking()  - Ensure pending tasks are executed and while-running tasks are not until the next method invocation
+//       - run_blocking()      - Ensure pending tasks and while-running tasks are executed
+//       - tick()              - Ensure same behavior as run_non_blocking()

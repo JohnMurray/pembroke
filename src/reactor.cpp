@@ -7,6 +7,11 @@ extern "C" {
 }
 
 namespace pembroke {
+
+    /* ---
+     * REACTOR CONFIGURATION CODE
+     * --- */
+
     ReactorBuilder reactor() noexcept {
         return ReactorBuilder{};
     }
@@ -34,6 +39,10 @@ namespace pembroke {
     std::unique_ptr<Reactor> ReactorBuilder::build() const noexcept {
         return std::make_unique<Reactor>(*this);
     }
+
+    /* ---
+     * REACTOR IMPLEMENTATION CODE
+     * --- */
 
     Reactor::Reactor(const ReactorBuilder &builder) {
         auto config = std::unique_ptr<
@@ -71,5 +80,29 @@ namespace pembroke {
         if (m_base == nullptr) {
             throw ConfigurationException("Unable to construct reactor with current configuration");
         }
+    }
+
+    bool Reactor::run_non_blocking() const {
+        return event_base_loop(m_base.get(), EVLOOP_NONBLOCK) == 0;
+    }
+
+    bool Reactor::run_blocking() const {
+        return event_base_loop(m_base.get(), EVLOOP_NO_EXIT_ON_EMPTY) == 0;
+    }
+
+    bool Reactor::pause() const {
+        return event_base_loopbreak(m_base.get()) == 0;
+    }
+
+    bool Reactor::resume() const {
+        return event_base_loopcontinue(m_base.get()) == 0;
+    }
+
+    bool Reactor::tick() const {
+        return event_base_loop(m_base.get(), EVLOOP_ONCE) == 0;
+    }
+
+    bool Reactor::tick_non_blocking() const {
+        return event_base_loop(m_base.get(), EVLOOP_ONCE | EVLOOP_NONBLOCK) == 0;
     }
 } // namespace pembroke
