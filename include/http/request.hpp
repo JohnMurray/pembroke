@@ -7,7 +7,7 @@ extern "C" {
 struct evhttp_request;
 }
 
-namespace event::http {
+namespace pembroke::http {
 
     /**
      * @brief A lazily-constructed, immutable request class.
@@ -47,4 +47,4 @@ namespace event::http {
         Request(evhttp_request *req) noexcept;
     };
 
-} // namespace event::http
+} // namespace pembroke::http

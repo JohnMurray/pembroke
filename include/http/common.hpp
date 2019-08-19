@@ -1,4 +1,4 @@
-namespace event::http {
+namespace pembroke::http {
 
     enum class Method {
         GET,
@@ -10,4 +10,4 @@ namespace event::http {
         OPTIONS
     };
 
-} // event::http
+} // pembroke::http

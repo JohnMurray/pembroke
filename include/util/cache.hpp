@@ -1,4 +1,4 @@
-namespace event::util {
+namespace pembroke::util {
 
     template<typename T>
     class Memoize {
@@ -35,4 +35,4 @@ namespace event::util {
         T m_value;
     };
 
-} // event::util
+} // pembroke::util

@@ -5,7 +5,7 @@ extern "C" {
 #include <event2/http.h>
 }
 
-namespace event::http {
+namespace pembroke::http {
     // ---
     // ConstRequest Implementation
     // ---
@@ -28,4 +28,4 @@ namespace event::http {
         other.m_req = nullptr;
         return *this;
     }
-}
+} // namespace pembroke::http
