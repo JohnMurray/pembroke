@@ -18,7 +18,7 @@ TEST_CASE("Reactor multiple constructable", "[reactor][smoke]") {
 TEST_CASE("Reactor features-toggles", "[reactor][smoke]") {
     auto builder = pembroke::reactor();
 
-    SECTION("toggle all on") {
+    SECTION("toggle all (on by default)") {
         REQUIRE_NOTHROW(builder.require_edge_trigger_support());
         REQUIRE_NOTHROW(builder.require_file_descriptor_support());
         REQUIRE_NOTHROW(builder.require_early_close_support());

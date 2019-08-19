@@ -1,5 +1,7 @@
 # Pembroke
 
+[![CircleCI](https://circleci.com/gh/JohnMurray/pembroke/tree/master.svg?style=svg)](https://circleci.com/gh/JohnMurray/pembroke/tree/master)
+
 Pembroke aims to be a composable wrapper around the [libevent][libevent_homepage] C library, providing low
 level primitives (reactors, I/O buffers, etc) as well as higher level abstractions (web-server, HTTP clients)
 in an intuitive, simple, and well-documented interface.
