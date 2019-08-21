@@ -36,7 +36,6 @@ target_include_directories(pembroke
 find_package(Catch2 REQUIRED)
 add_executable(tests
     src/main_test.cpp
-    src/util/cache_test.cpp
     src/reactor_test.cpp
     src/task_test.cpp
 )
