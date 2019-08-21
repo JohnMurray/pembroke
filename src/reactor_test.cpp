@@ -2,12 +2,12 @@
 
 #include "reactor.hpp"
 
-TEST_CASE("Reactor easily constructable", "[reactor][smoke]") {
+TEST_CASE("Reactor easily constructable", "[reactor][construction]") {
     REQUIRE_NOTHROW(pembroke::reactor());
     REQUIRE_NOTHROW(pembroke::reactor().build());
 }
 
-TEST_CASE("Reactor multiple constructable", "[reactor][smoke]") {
+TEST_CASE("Reactor multiple constructable", "[reactor][construction]") {
     std::unique_ptr<pembroke::Reactor> r1;
     std::unique_ptr<pembroke::Reactor> r2;
 
@@ -15,7 +15,7 @@ TEST_CASE("Reactor multiple constructable", "[reactor][smoke]") {
     REQUIRE_NOTHROW(r2 = pembroke::reactor().build());
 }
 
-TEST_CASE("Reactor features-toggles", "[reactor][smoke]") {
+TEST_CASE("Reactor features-toggles", "[reactor][construction]") {
     auto builder = pembroke::reactor();
 
     SECTION("toggle all (on by default)") {
