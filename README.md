@@ -10,6 +10,10 @@ This project is a for-fun project that aims to be a big boy one day. Until that 
 work is unlikely to be tracked in tickets. If you are interested in contributing, please open an issue so we
 can discuss.
 
+## W.I.P.
+
+See [TODO.md][todo_file] for more details on the current progress and planning.
+
 ## Goals
 
 The end-state for the project should ideally meet the following criteria.
@@ -28,3 +32,4 @@ See [LICENSE.txt][license_file] for more details.
 
   [libevent_homepage]: https://libevent.org/
   [license_file]: ./LICENSE.txt
+  [todo_file]: ./TODO.md
