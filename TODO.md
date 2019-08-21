@@ -5,7 +5,7 @@ Development Tasks
   [ ] Base/basic `task` class
   [ ] Testing reactor execution with `task`
   [ ] Timed and scheduled `task`
-  [ ] Internal logging system that can hook into whatever the client wants
+  [x] Internal logging system that can hook into whatever the client wants
       to use (with some `on_log` hook somewhere)
 
 Support Tasks
