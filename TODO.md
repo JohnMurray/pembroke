@@ -1,6 +1,6 @@
 # ToDo
 
-Development Tasks
+### Development Tasks
 
   - [ ] Base/basic `task` class
   - [ ] Testing reactor execution with `task`
@@ -8,7 +8,7 @@ Development Tasks
   - [x] Internal logging system that can hook into whatever the client wants
       to use (with some `on_log` hook somewhere)
 
-Support Tasks
+### Support Tasks
 
   - [ ] Setup tests to run with clang sanitizer(s)
   - [ ] Generate documentation with Doxygen
