@@ -15,6 +15,11 @@ namespace pembroke::logger {
     };
 
     /**
+     * @brief Assign a global log-message handler for all internal pembroke messages
+     */
+    void register_handler(const std::function<void(Level, std::string_view)> &f);
+
+    /**
      * @brief Register a handler that will receive all of the log messages produced by
      *        the pembroke library.
      * @note  This is a utility wrapper for the non-generic `register_handler` function
@@ -30,11 +35,6 @@ namespace pembroke::logger {
         std::function<void(Level, std::string_view)> func {f};
         register_handler(func);
     }
-
-    /**
-     * @brief Assign a global log-message handler for all internal pembroke messages
-     */
-    void register_handler(const std::function<void(Level, std::string_view)> &f);
 
 
 } // namespace pembroke::logger
