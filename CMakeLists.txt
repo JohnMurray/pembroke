@@ -13,6 +13,7 @@ conan_basic_setup()
 ## Pembroke Library Definition
 ## ---
 add_library(pembroke
+    src/event.cpp
     src/http/request.cpp
     src/internal/logging.cpp
     src/reactor.cpp
