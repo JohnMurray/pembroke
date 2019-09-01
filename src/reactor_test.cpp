@@ -1,6 +1,16 @@
 #include <catch2/catch.hpp>
 
+#include <chrono>
+#include <thread>
+
 #include "reactor.hpp"
+
+using namespace std::chrono_literals;
+
+
+// ---
+// Basic Construction and Builder Configurations
+// ---
 
 TEST_CASE("Reactor easily constructable", "[reactor][construction]") {
     REQUIRE_NOTHROW(pembroke::reactor());
@@ -45,33 +55,148 @@ TEST_CASE("Reactor features-toggles", "[reactor][construction]") {
     }
 }
 
+// ---
+// No-Op Execution
+// ---
+
 TEST_CASE("Reactor runs with no scheduled events", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
-    REQUIRE_NOTHROW(r->run_non_blocking());
+    for (int i = 0; i < 10; i++) {
+        REQUIRE_NOTHROW(r->tick());
+        REQUIRE_NOTHROW(r->tick_fast());
+    }
 }
 
-TEST_CASE("Reactor resumes post-run, repeatedly", "[reactor][execution]") {
+TEST_CASE("Reactor ticks after post-run-stop", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
-    r->run_non_blocking();
 
-    CHECK(r->resume());
-    CHECK(r->resume());
-    CHECK(r->resume());
+    for (int i = 0; i < 10; i++) {
+        CHECK(r->tick());
+        CHECK(r->stop());
+    }
 }
 
-TEST_CASE("Reactor pauses post-run, repeatedly", "[reactor][execution]") {
+TEST_CASE("Reactor stops post-run, repeatedly", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
-    r->run_non_blocking();
+    r->tick();
 
-    CHECK(r->pause());
-    CHECK(r->pause());
-    CHECK(r->pause());
+    for (int i = 0; i < 10; i++) {
+        CHECK(r->stop());
+    }
 }
 
-// TODO: Using tasks, validate the behavior:
-//       - pause()             - Ensure pause actually pauses a reactor from within a task
-//       - resume()            - Ensure resume actually resumes from a paused task (paused from a task)
-//                             - Ensure pending tasks are run on resume (that were scheduled during a pause)
-//       - run_non_blocking()  - Ensure pending tasks are executed and while-running tasks are not until the next method invocation
-//       - run_blocking()      - Ensure pending tasks and while-running tasks are executed
-//       - tick()              - Ensure same behavior as run_non_blocking()
+// ---
+// Scheduled Events
+// ---
+
+TEST_CASE("Schedule zero-wait timer", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    r->new_timer([&]() -> void {
+        x += 1;
+    }, 0s);
+
+    r->tick();
+    CHECK(x == 1);
+}
+
+TEST_CASE("Schedule delayed timer (blocking)", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    r->new_timer([&]() -> void {
+        x += 1;
+        r->stop();
+    }, 100us);
+
+    r->run_blocking();
+    CHECK(x == 1);
+}
+
+TEST_CASE("Schedule delayed timer (non-blocking)", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    r->new_timer([&]() -> void {
+        x += 1;
+    }, 100us);
+
+    r->tick();
+    CHECK(x == 0);
+
+    std::this_thread::sleep_for(10ms);
+
+    r->tick();
+    CHECK(x == 1);
+}
+
+TEST_CASE("Cancel a scheduled, delayed timer", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    auto e = r->new_timer([&]() -> void {
+        x += 1;
+    }, 10us);
+    e.cancel();
+
+    std::this_thread::sleep_for(10ms);
+    r->tick();
+    CHECK(x == 0);
+}
+
+// ---
+// Stop & Resume (with Events)
+// ---
+
+TEST_CASE("Stop. Do not execute pending tasks", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    r->new_timer([&]() -> void { 
+        x += 1;
+        r->stop();
+    }, 10us);
+    r->new_timer([&]() -> void { x += 1; }, 100us);
+    r->new_timer([&]() -> void { x += 1; }, 100us);
+    r->new_timer([&]() -> void { x += 1; }, 100us);
+
+    std::this_thread::sleep_for(10ms);
+    r->run_blocking();
+    CHECK(x == 1);
+}
+
+TEST_CASE("Resume and execute pending tasks", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    r->new_timer([&]() -> void { 
+        x += 1;
+        r->stop();
+    }, 0us);
+    r->new_timer([&]() -> void { x += 1; }, 100us);
+    r->new_timer([&]() -> void { x += 1; }, 100us);
+    r->new_timer([&]() -> void { x += 1; }, 100us);
+
+    r->run_blocking();
+    std::this_thread::sleep_for(10ms);
+    r->tick();
+    CHECK(x == 4);
+}
+
+TEST_CASE("Schedule events while paused, execute on resumption", "[reactor][execution]") {
+    auto r = pembroke::reactor().build();
+    auto x = 0;
+
+    r->new_timer([&]() -> void { 
+        x += 1;
+        r->stop();
+        r->new_timer([&]() -> void { x += 1; }, 0us);
+        r->new_timer([&]() -> void { x += 1; }, 0us);
+        r->new_timer([&]() -> void { x += 1; }, 0us);
+    }, 0us);
+
+    r->tick(); // stopped on first tick
+    r->tick(); // execute events schedule post-stop
+    CHECK(x == 4);
+}

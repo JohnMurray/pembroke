@@ -1,4 +1,5 @@
 #include "reactor.hpp"
+#include "scheduler.hpp"
 
 #include <memory>
 
@@ -8,9 +9,14 @@ extern "C" {
 
 namespace pembroke {
 
-    /* ---
-     * REACTOR CONFIGURATION CODE
-     * --- */
+    constexpr int LOOP_RAN_SUCCESSFULLY = 0;
+    constexpr int LOOP_RAN_NO_EVENTS = 1;
+
+    constexpr int LOOP_BREAK_SUCCESS = 0;
+
+    // ---
+    // REACTOR CONFIGURATION / BUILDER CODE
+    // ---
 
     ReactorBuilder reactor() noexcept {
         return ReactorBuilder{};
@@ -40,9 +46,9 @@ namespace pembroke {
         return std::make_unique<Reactor>(*this);
     }
 
-    /* ---
-     * REACTOR IMPLEMENTATION CODE
-     * --- */
+    // ---
+    // REACTOR IMPLEMENTATION CODE
+    // ---
 
     Reactor::Reactor(const ReactorBuilder &builder) {
         auto config = std::unique_ptr<
@@ -82,27 +88,74 @@ namespace pembroke {
         }
     }
 
-    bool Reactor::run_non_blocking() const {
-        return event_base_loop(m_base.get(), EVLOOP_NONBLOCK) == 0;
+    bool Reactor::run_blocking() const noexcept {
+        return event_base_loop(m_base.get(), EVLOOP_NO_EXIT_ON_EMPTY) == LOOP_RAN_SUCCESSFULLY;
     }
 
-    bool Reactor::run_blocking() const {
-        return event_base_loop(m_base.get(), EVLOOP_NO_EXIT_ON_EMPTY) == 0;
+    bool Reactor::stop() const noexcept {
+        return event_base_loopbreak(m_base.get()) == LOOP_BREAK_SUCCESS;
     }
 
-    bool Reactor::pause() const {
-        return event_base_loopbreak(m_base.get()) == 0;
+    bool Reactor::tick() const noexcept {
+        if (event_base_get_num_events(m_base.get(), EVENT_BASE_COUNT_ACTIVE) > 0) {
+            /* If we know we have active events, pass EVLOOP_ONCE to ensure
+             * that we're waiting for current active events to finish and run
+             * thier callbacks. */
+            return event_base_loop(m_base.get(), EVLOOP_ONCE) == LOOP_RAN_SUCCESSFULLY;
+        }
+        /* If we don't have any active events, still run the loop, but run with
+         * EVLOOP_NONBLOCK, which will not block until any events are active. */
+        int ret;
+        ret = event_base_loop(m_base.get(), EVLOOP_NONBLOCK);
+        return (ret == LOOP_RAN_NO_EVENTS) || (ret == LOOP_RAN_SUCCESSFULLY);
     }
 
-    bool Reactor::resume() const {
-        return event_base_loopcontinue(m_base.get()) == 0;
+    bool Reactor::tick_fast() const noexcept {
+        /* Use EVLOOP_NONBLOCK to only execute callbacks for high-priority,
+         * ready events */
+        int ret = event_base_loop(m_base.get(), EVLOOP_NONBLOCK);
+        return (ret == LOOP_RAN_SUCCESSFULLY) || (ret == LOOP_RAN_NO_EVENTS);
     }
 
-    bool Reactor::tick() const {
-        return event_base_loop(m_base.get(), EVLOOP_ONCE) == 0;
+    const Event Reactor::new_timer(
+        const std::function<void()> &cb,
+        const std::chrono::duration<long, std::micro> &delay) noexcept {
+
+        timeval tv {.tv_usec = static_cast<int>(delay.count()) };
+        auto ctx = std::make_shared<EventContext>(++m_event_index, cb);
+        auto event = evtimer_new(m_base.get(), Reactor::run_timer_cb, ctx.get());
+
+        /* Configure the context and store in the reactor to reference back to later */
+        ctx->event = event;
+        ctx->post_event_cleanup = [event, this, ctx]() -> void {
+            this->m_timers.erase(ctx);
+            event_free(event);
+            ctx->event = nullptr;
+        };
+        m_timers.insert(ctx);
+
+        /* Schedule event to run with provided delay (time-value) */
+        evtimer_add(event, &tv);
+
+        /* Return an event object to give the user a way to cancel the event
+         * before it is executed. */
+        return Event([ctx, this]() -> bool {
+            bool ret = true;
+            if (ctx->event != nullptr) {
+                auto ev = const_cast<struct event*>(ctx->event);
+                ret = evtimer_del(ev) == 0;
+                event_free(ev);
+                this->m_timers.erase(ctx);
+            }
+            return ret;
+        });
     }
 
-    bool Reactor::tick_non_blocking() const {
-        return event_base_loop(m_base.get(), EVLOOP_ONCE | EVLOOP_NONBLOCK) == 0;
+    void Reactor::run_timer_cb(int, short, void* cb) {
+        auto ctx = static_cast<EventContext *>(cb);
+        ctx->callback();
+        ctx->post_event_cleanup();
+        ctx->post_event_cleanup = util::nop_f;
     }
+
 } // namespace pembroke
