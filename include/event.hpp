@@ -43,6 +43,13 @@ namespace pembroke {
         std::function<void()> post_event_cleanup = util::nop_f;
 
         EventContext(uint64_t key, std::function<void()> cb) noexcept;
+        ~EventContext() = default;
+
+        EventContext(const EventContext &ctx) = delete;
+        EventContext(EventContext &&ctx) = delete;
+
+        EventContext &operator=(const EventContext &ctx) = delete;
+        EventContext &operator=(EventContext &&ctx) = delete;
     };
 
     /** @brief Required operator for using EventContext within a set/map */

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <thread>
+#include <type_traits>
 
 #include "reactor.hpp"
 
@@ -53,6 +54,16 @@ TEST_CASE("Reactor features-toggles", "[reactor][construction]") {
         REQUIRE_NOTHROW(builder.require_order_one_trigger_support(false));
         CHECK_FALSE(builder.m_require_order_one_trigger);
     }
+}
+
+TEST_CASE("Reactor cannot be copied", "[reactor][construction]") {
+    CHECK_FALSE(std::is_copy_assignable<pembroke::Reactor>::value);
+    CHECK_FALSE(std::is_copy_constructible<pembroke::Reactor>::value);
+}
+
+TEST_CASE("Reactor cannot be moved", "[reactor][construction]") {
+    CHECK_FALSE(std::is_move_assignable<pembroke::Reactor>::value);
+    CHECK_FALSE(std::is_move_constructible<pembroke::Reactor>::value);
 }
 
 // ---

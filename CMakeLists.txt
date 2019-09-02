@@ -38,6 +38,7 @@ find_package(Catch2 REQUIRED)
 add_executable(tests
     src/main_test.cpp
 
+    src/event_test.cpp
     src/internal/logging_test.cpp
     src/reactor_test.cpp
     src/task_test.cpp

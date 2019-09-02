@@ -43,6 +43,14 @@ namespace pembroke {
          */
         Reactor(const ReactorBuilder &builder);
 
+        ~Reactor() = default;
+
+        Reactor(const Reactor &r) = delete;
+        Reactor(Reactor &&r) = delete;
+
+        Reactor &operator=(const Reactor &r) = delete;
+        Reactor &operator=(Reactor &&r) = delete;
+
         /**
          * @brief Run the reactor in a blocking fashion and do not exit.
          * @note In order to exit the event-loop, you will need to call `pause()` from an event
@@ -74,6 +82,14 @@ namespace pembroke {
          */
         bool tick_fast() const noexcept;
 
+        /**
+         * @brief Stop the reactor, returning control to the portion of code that invoked the blocking
+         *        run (`blocking_run()`). If the reactor is not running, this function will have no
+         *        success.
+         * @see blocking_run()
+         * @return True if the reactor was successfully stopped (or if the reactor was not runnig), False
+         *         if an error was encountered while attempting to stop.
+         */
         bool stop() const noexcept;
 
 
