@@ -2,11 +2,12 @@
 
 ### Development Tasks
 
-  - [ ] Base/basic `task` class
-  - [ ] Testing reactor execution with `task`
-  - [ ] Timed and scheduled `task`
+  - [ ] Scheduler for timed events
   - [x] Internal logging system that can hook into whatever the client wants
       to use (with some `on_log` hook somewhere)
+  - [ ] File I/O support
+  - [ ] Discover available libevent configuration options on startup
+        (such as file-io support, edge-triggering support, etc)
 
 ### Support Tasks
 
