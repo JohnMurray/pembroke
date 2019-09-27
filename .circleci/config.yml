@@ -13,11 +13,11 @@ jobs:
 
       - run:
           name: Build Tool Setup (python)
-          command: apt-get install -y python3 python3-pip
+          command: apt-get install -y python3 python3-pip && pip3 install -U pip
 
       - run:
           name: Build Tool Setup (conan)
-          command: pip3 install scikit-build && pip3 install conan cmake && conan config get
+          command: pip install conan cmake && conan config get
       
       - run:
           name: Conan Install 3rd Party Dependencies
