@@ -21,7 +21,7 @@ jobs:
       
       - run:
           name: Conan Install 3rd Party Dependencies
-          command: mkdir build && cd build && conan install ..
+          command: mkdir build && cd build && conan install ../pembroke
       
       - run:
           name: CMake Setup
