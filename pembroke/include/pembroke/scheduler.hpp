@@ -11,32 +11,9 @@
 
 namespace pembroke {
     using namespace std::chrono_literals;
+    using timespan = std::chrono::duration<long, std::micro>;
 
-    const auto no_delay = 0s;
-
-    /**
-     * @brief A handle to cancel tasks that have been scheduled on a reactor
-     */
-    class Cancelable {
-    private:
-        /** @brief Callback provided at construction, to be invoked by `cancel()` */
-        std::function<bool()> m_cancel_cb;
-    public:
-
-        Cancelable(std::function<bool()>) noexcept;
-        /**
-         * @brief Attempts to cancel an event on the reactor
-         * 
-         * This function may return False for a number of reasons, such as:
-         *   - The task was scheduled to run once and has already been executed (nothing to cancel)
-         *   - The reactor has been shut-down and cleaned up, nothing to cancel
-         *   - An unexpected error was encountered when cancelling the task
-         * 
-         * @returns True if the operation can be canceled, False otherwise
-         */
-        [[nodiscard]]
-        bool cancel() const noexcept;
-    };
+    constexpr auto no_delay = 0s;
 
     /**
      * @brief Schedules tasks to be run on the reactor
@@ -47,7 +24,9 @@ namespace pembroke {
      *       reactor.
      */
     class Scheduler {
-        friend class Reactor;
+        /* To provide Reactor with acess to the private constructor. See @note on class */
+        friend Reactor;
+
     private:
         const Reactor *m_reactor;
         uint32_t m_task_index{0};
@@ -57,7 +36,10 @@ namespace pembroke {
     
     public:
         [[nodiscard]]
-        std::shared_ptr<Cancelable> schedule_once(const Task &t, const std::chrono::duration<long, std::micro> &delay) noexcept;
+        std::shared_ptr<Event> schedule_once(const Task &t, const timespan &delay) noexcept;
+
+        [[nodiscard]]
+        std::shared_ptr<Event> repeat(const Task &t, const timespan &interval) noexcept;
 
     private:
         /**
@@ -67,10 +49,10 @@ namespace pembroke {
          * more user-friendly interface to interact with.
          */
         [[nodiscard]]
-        std::shared_ptr<Cancelable> schedule(const Task &t,
-            const std::chrono::duration<long, std::micro> &delay,
+        std::shared_ptr<Event> schedule(const Task &t,
+            const timespan &delay,
             std::variant<bool, uint32_t> repeat,
-            const std::chrono::duration<long, std::micro> &interval) noexcept;
+            const timespan &interval) noexcept;
 
         static void handle_timer(int, short, void *arg) noexcept;
     };

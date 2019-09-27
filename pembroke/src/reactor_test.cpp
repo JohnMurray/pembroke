@@ -97,7 +97,7 @@ TEST_CASE("Reactor stops post-run, repeatedly", "[reactor][execution]") {
 }
 
 // ---
-// Scheduled Events
+// Scheduled (Timed) Events
 // ---
 
 TEST_CASE("Schedule zero-wait timer", "[reactor][execution]") {
