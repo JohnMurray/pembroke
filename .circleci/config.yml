@@ -17,7 +17,7 @@ jobs:
 
       - run:
           name: Build Tool Setup (conan)
-          command: pip3 install conan cmake && conan config get
+          command: pip3 install scikit-build && pip3 install conan cmake && conan config get
       
       - run:
           name: Conan Install 3rd Party Dependencies
