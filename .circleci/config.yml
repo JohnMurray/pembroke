@@ -37,4 +37,4 @@ jobs:
       
       - run:
           name: CTest
-          command: make test
+          command: cd build && make test
