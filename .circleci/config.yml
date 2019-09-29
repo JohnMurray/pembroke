@@ -13,28 +13,19 @@ jobs:
 
       - run:
           name: Build Tool Setup (python)
-          command: |\n
-            apt-get install -y python3 python3-pip && \
-            pip3 install -U pip
+          command: apt-get install -y python3 python3-pip && pip3 install -U pip
 
       - run:
           name: Build Tool Setup (conan)
-          command: |\n
-            pip install conan cmake && \
-            conan config get
+          command: pip install conan cmake && conan config get
       
       - run:
           name: Conan Install 3rd Party Dependencies
-          command: |\n
-            mkdir build && \
-            cd build && \
-            conan install ../pembroke
+          command: mkdir build && cd build && conan install ../pembroke
 
       - run:
           name: Doc Tools Setup
-          command: |\n
-            apt-get install -y doxygen && \
-            pip install -U sphinx breathe
+          command: apt-get install -y doxygen && pip install -U sphinx breathe
       
       - run:
           name: CMake Setup
