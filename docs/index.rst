@@ -11,6 +11,9 @@ Welcome to Pembroke's documentation!
    :caption: Contents:
 
 
+.. doxygenclass:: pembroke::Reactor
+   :members:
+
 
 Indices and tables
 ==================
