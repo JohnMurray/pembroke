@@ -43,6 +43,5 @@ target_link_libraries(tests
     Catch2::Catch2
     pembroke
 )
-enable_testing()
 include(Catch)
 catch_discover_tests(tests)

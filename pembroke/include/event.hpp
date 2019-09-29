@@ -9,7 +9,7 @@
 namespace pembroke {
 
     /**
-     * @breif Represents any event that has been scheduled on the Reactor
+     * @brief Represents any event that has been scheduled on the Reactor
      *
      * The sole purpose of the `Event` class is to handle cancellation. The class
      * generically handles different types of events (I/O, timers, etc).
