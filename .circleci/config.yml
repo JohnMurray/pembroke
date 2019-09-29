@@ -25,15 +25,15 @@ jobs:
       
       - run:
           name: Conan Install 3rd Party Dependencies
-          command: >\n
-            mkdir build &&
-            cd build &&
+          command: |\n
+            mkdir build && \
+            cd build && \
             conan install ../pembroke
 
       - run:
           name: Doc Tools Setup
-          command: >\n
-            apt-get install -y doxygen &&
+          command: |\n
+            apt-get install -y doxygen && \
             pip install -U sphinx breathe
       
       - run:
