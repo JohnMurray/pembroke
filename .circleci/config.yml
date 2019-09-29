@@ -13,14 +13,14 @@ jobs:
 
       - run:
           name: Build Tool Setup (python)
-          command: >\n
-            apt-get install -y python3 python3-pip &&
+          command: |\n
+            apt-get install -y python3 python3-pip && \
             pip3 install -U pip
 
       - run:
           name: Build Tool Setup (conan)
-          command: >\n
-            pip install conan cmake &&
+          command: |\n
+            pip install conan cmake && \
             conan config get
       
       - run:
