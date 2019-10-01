@@ -1,3 +1,10 @@
-build/
+# Editor Files
 .vscode/
 *.swp
+
+# Build Artifacts/Directories
+build/
+docs/html/
+
+# Misc. Excluded Files
+*.pyc

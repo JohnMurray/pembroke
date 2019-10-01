@@ -1,4 +1,8 @@
-# Logging
+=======
+Logging
+=======
+
+.. highlight:: c++
 
 Pembroke does not enforce any kind of logging standard on you, so feel free to
 use whatever tickles your fancy. That being said, Pembroke does produce some
@@ -10,18 +14,19 @@ logging framework of choice. By default these hooks are a no-op, meaning any log
 produces by Pembroke are discarded. To provide your own hook, simply add the
 following to your code:
 
-```C++
-#include <string_view>
-#include <pembroke/logging.hpp>
+.. code-block::
+   :linenos:
 
-using namespace pembroke;
-
-logger::register_handler([&my_logger](logger::Level l, std::string_view msg) -> void {
-    if (l == logger::Level::Error) {
-        my_logger.error(msg);
-    }
-});
-```
+   #include <string_view>
+   #include <pembroke/logging.hpp>
+  
+   using namespace pembroke;
+  
+   logger::register_handler([&my_logger](logger::Level l, std::string_view msg) -> void {
+       if (l == logger::Level::Error) {
+           my_logger.error(msg);
+       }
+   });
 
 If multiple handlers are registered, only the last one will be used. If multi-dispatch
 logging is a feature required by your application, you'll need to handle that yourself
