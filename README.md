@@ -23,6 +23,16 @@ The end-state for the project should ideally meet the following criteria.
     sane defaults should be provided without cost to the user.
   + Expose a clean, safe, and sane interface to working with event-loops, using the LibEvent framework.
 
+## Documentation
+
+While this project is _definitely_ a W.I.P. I will try to have documentation available for the bits that are
+_usable_ (not necessarily production ready). Documentation is auto-generated and published to ReadTheDocs and
+are available here:
+
+[pembroke.readthedocs.io](https://pembroke.readthedocs.io/)
+
+Anything not documented here is likely something I'm not considering "usable" at the moment.
+
 ## License
 
 This project is licensed under the permissive MIT license, but if you find this code useful and have used it
