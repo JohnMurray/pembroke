@@ -57,15 +57,7 @@ rewrite out first "no-op" example to be non-blocking with:
 However, if we register new events after ``tick()`` is called, or if new events become ready,
 we'll need to call this function again.
 
+----
 
-************
-Timed Events
-************
-
-************
-File I/O
-************
-
-************
-Network I/O
-************
+Now that you've gotten a simple reactor up and running see :ref:`timers_schedules`,
+:ref:`file_io`, and :ref:`network_io` to see what you can do with it.

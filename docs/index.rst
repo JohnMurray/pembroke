@@ -15,11 +15,14 @@ be helpful to get up and running with your application.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Guide
 
    installing
    getting-started
    logging
+   timers_schedules
+   file_io
+   network_io
 
 
 .. toctree::
