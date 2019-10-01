@@ -45,12 +45,13 @@ set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 #   - Doxygen has rerun
 #   - Our doc/* files have been updated (that we care about)
 #   - The Sphinx config has been updated
+file(GLOB_RECURSE DOC_ReST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.rst)
 add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                   COMMAND ${SPHINX_EXECUTABLE} -b html -Dbreathe_projects.Pembroke=${DOXYGEN_OUTPUT_DIR}/xml
                                                ${SPHINX_SOURCE} ${SPHINX_BUILD}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   DEPENDS
-                    ${CMAKE_CURRENT_SOURCE_DIR}/index.rst
+                    ${DOC_ReST_FILES}
                     ${DOXYGEN_INDEX_FILE}
                   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
                   COMMENT "Generating documentation with Sphinx")
