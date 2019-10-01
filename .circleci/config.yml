@@ -25,7 +25,7 @@ jobs:
 
       - run:
           name: Doc Tools Setup
-          command: apt-get install -y doxygen && pip install -U sphinx breathe
+          command: apt-get install -y doxygen && pip install -U sphinx breathe sphinx_rtd_theme
       
       - run:
           name: CMake Setup
