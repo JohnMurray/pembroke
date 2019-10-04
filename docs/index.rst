@@ -7,6 +7,13 @@
 Pembroke
 ########
 
+Welcome to `Pembroke`_!
+
+Pembroke aims to be a composable wrapper around the `libevent`_
+C library, providing low level primitives (reactors, I/O buffers, etc) as well as
+higher level abstractions (web-server, HTTP clients) in an intuitive, simple, and
+well-documented interface.
+
 The following docs will help you get started, cover some common use-cases, and provide
 higher-level documentation for building an application. See next section for API docs.
 
@@ -36,3 +43,8 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
+
+
+
+.. _Pembroke: https://github.com/JohnMurray/pembroke
+.. _libevent: https://libevent.org/
