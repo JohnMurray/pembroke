@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * This is a convenience file to import common headers. There is nothing special about
  * this file and you can ignore it in application code if preferred. Most of the examples

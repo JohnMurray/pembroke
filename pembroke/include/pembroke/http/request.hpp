@@ -1,7 +1,7 @@
 #include <memory>
 
-#include "http/common.hpp"
-#include "util/cache.hpp"
+#include "pembroke/http/common.hpp"
+#include "pembroke/util/cache.hpp"
 
 extern "C" {
 struct evhttp_request;

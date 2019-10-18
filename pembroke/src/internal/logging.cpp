@@ -1,5 +1,5 @@
-#include "logging.hpp"
-#include "internal/logging.hpp"
+#include "pembroke/logging.hpp"
+#include "pembroke/internal/logging.hpp"
 
 namespace pembroke::logger {
 
