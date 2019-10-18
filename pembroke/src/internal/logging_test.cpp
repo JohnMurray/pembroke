@@ -2,9 +2,9 @@
 #include <string>
 #include <string_view>
 
-#include "logging.hpp"
-#include "internal/logging.hpp"
-#include "internal/test_common.hpp"
+#include "pembroke/logging.hpp"
+#include "pembroke/internal/logging.hpp"
+#include "pembroke/internal/test_common.hpp"
 
 using namespace pembroke;
 

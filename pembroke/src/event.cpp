@@ -1,9 +1,9 @@
-#include "event.hpp"
+#include "pembroke/event.hpp"
 
 #include <exception>
 #include <sstream>
 
-#include "internal/logging.hpp"
+#include "pembroke/internal/logging.hpp"
 
 namespace pembroke {
 

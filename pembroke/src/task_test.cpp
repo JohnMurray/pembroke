@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include "task.hpp"
+#include "pembroke/task.hpp"
 
 TEST_CASE("task constructable with lambda", "[task][construction]") {
     int x = 0;

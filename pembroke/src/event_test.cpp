@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "event.hpp"
+#include "pembroke/event.hpp"
 
 /*
  * The event is a very simple class that is closely related to the reactor. As such,

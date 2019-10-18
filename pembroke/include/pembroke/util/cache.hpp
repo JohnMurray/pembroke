@@ -1,3 +1,5 @@
+#pragma once
+
 namespace pembroke::util {
 
     template<typename T>
