@@ -24,11 +24,6 @@ namespace pembroke {
     // Move Constructor / Asignment
     // ---
     Buffer::Buffer(Buffer &&b) noexcept {
-        if (m_underlying != nullptr) {
-            // make sure to free any existing resources
-            evbuffer_free(m_underlying);
-        }
-
         m_underlying = b.m_underlying;
         b.m_underlying = nullptr;
     }
@@ -61,6 +56,17 @@ namespace pembroke {
             return;
         }
         evbuffer_add(m_underlying, c_str, n_chars);
+    }
+
+    void Buffer::add(const std::byte *bytes, size_t n_bytes) noexcept {
+        if (m_underlying == nullptr) {
+            return;
+        }
+        evbuffer_add(m_underlying, bytes, n_bytes);
+    }
+
+    void Buffer::add(const ByteSlice &byte_slice) noexcept {
+        add(byte_slice.bytes, byte_slice.len);
     }
 
 
@@ -99,5 +105,18 @@ namespace pembroke {
         unsigned char *data = evbuffer_pullup(m_underlying, len);
 
         return std::string(reinterpret_cast<char *>(data), len);
+    }
+
+    ByteSlice Buffer::bytes() const noexcept {
+        if (m_underlying == nullptr) {
+            return ByteSlice{nullptr, 0};
+        }
+        size_t len = evbuffer_get_length(m_underlying);
+        return ByteSlice {
+            /* because std::byte is defined by the standard as an unsigned char,
+             * this should be safe */
+            .bytes = reinterpret_cast<std::byte *>(evbuffer_pullup(m_underlying, len)),
+            .len = len,
+        };
     }
 }

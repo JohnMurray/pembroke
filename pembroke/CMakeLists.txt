@@ -39,6 +39,8 @@ add_executable(tests
     src/internal/logging_test.cpp
     src/reactor_test.cpp
     src/task_test.cpp
+
+    src/internal/test_common.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 17)
 target_link_libraries(tests 

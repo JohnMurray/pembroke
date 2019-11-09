@@ -1,10 +1,13 @@
 #pragma once
 
+#include <cstddef>
 #include <string_view>
 
 #include "pembroke/internal/forward_decls.hpp"
 
 namespace pembroke {
+
+    class ByteSlice;
 
     class Buffer {
     private:
@@ -33,6 +36,10 @@ namespace pembroke {
 
         void add(const char *c_str, size_t n_chars) noexcept;
 
+        void add(const std::byte *bytes, size_t n_bytes) noexcept;
+
+        void add(const ByteSlice &byte_slice) noexcept;
+
 
         // ---
         // Read Functions
@@ -49,6 +56,14 @@ namespace pembroke {
 
         [[nodiscard]]
         std::string str() noexcept;
+
+        [[nodiscard]]
+        ByteSlice bytes() const noexcept;
+    };
+
+    struct ByteSlice {
+        std::byte *bytes;
+        size_t len;
     };
 
 }  // namespace pembroke
