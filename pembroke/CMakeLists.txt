@@ -8,6 +8,7 @@ conan_basic_setup()
 ## Pembroke Library Definition
 ## ---
 add_library(pembroke
+    src/buffer.cpp
     src/event.cpp
     src/http/request.cpp
     src/internal/logging.cpp
@@ -33,10 +34,13 @@ find_package(Catch2 REQUIRED)
 add_executable(tests
     src/main_test.cpp
 
+    src/buffer_test.cpp
     src/event_test.cpp
     src/internal/logging_test.cpp
     src/reactor_test.cpp
     src/task_test.cpp
+
+    src/internal/test_common.cpp
 )
 set_property(TARGET tests PROPERTY CXX_STANDARD 17)
 target_link_libraries(tests 

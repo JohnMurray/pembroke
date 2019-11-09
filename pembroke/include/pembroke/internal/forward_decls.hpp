@@ -12,6 +12,7 @@ extern "C" {
     // ---
     struct event_base;
     struct event;
+    struct evbuffer;
 
     // ---
     // Functions

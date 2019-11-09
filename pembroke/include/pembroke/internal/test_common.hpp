@@ -14,7 +14,7 @@
 
 #include <catch2/catch.hpp>
 
-#include "logging.hpp"
+#include "pembroke/logging.hpp"
 
 namespace pembroke {
 
@@ -22,20 +22,8 @@ namespace pembroke {
     std::tuple<
         std::function<void(logger::Level l, std::string_view msg)>,
         std::shared_ptr<std::unordered_map<logger::Level, std::stringstream>>
-    > test_stream_logger() {
-        auto logs = std::make_shared<std::unordered_map<logger::Level, std::stringstream>>();
-        logs->insert( {logger::Level::Trace, std::stringstream{}});
-        logs->insert({logger::Level::Debug, std::stringstream{}});
-        logs->insert({logger::Level::Info, std::stringstream{}});
-        logs->insert({logger::Level::Warn, std::stringstream{}});
-        logs->insert({logger::Level::Error, std::stringstream{}});
-        logs->insert({logger::Level::Crit, std::stringstream{}});
+    > test_stream_logger() noexcept;
 
-        auto f = [logs](logger::Level l, std::string_view msg) -> void {
-            (*logs)[l] << msg;
-        };
-
-        return std::make_tuple(f, logs);
-    }
+    void trample_stack() noexcept;
 
 } // namespace pembroke
