@@ -37,6 +37,7 @@ be helpful to get up and running with your application.
    :caption: API Docs
 
     Reactor <api/reactor>
+    Buffer <api/buffer>
 
 Indices and tables
 ==================
