@@ -38,6 +38,7 @@ be helpful to get up and running with your application.
 
     Reactor <api/reactor>
     Buffer <api/buffer>
+    Events <api/event>
 
 Indices and tables
 ==================

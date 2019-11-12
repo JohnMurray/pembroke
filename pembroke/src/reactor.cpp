@@ -132,7 +132,7 @@ namespace pembroke {
             event_free(event);
             ctx->event = nullptr;
         };
-        m_timers.insert(ctx);
+        m_timers.insert(std::move(ctx));
 
         /* Schedule event to run with provided delay (time-value) */
         evtimer_add(event, &tv);
