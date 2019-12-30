@@ -8,22 +8,29 @@
 
 namespace pembroke {
 
-    struct TaskContext {
-
-    };
+    /**
+     * @brief
+     * TaskContext is a context object that may be optionally consumed by a user-provided
+     * callable within the Task class. The context may be populated differently depending
+     * on how the Task was created and for what purpose (e.g. delayed event, scheduled
+     * task, etc).
+     * 
+     * @see pembroke::Task
+     */
+    struct TaskContext {};
 
     /**
      * @brief
      * Represents a unit of "work" to be performed. @a Work here is defined as
      * a function (or function-like thing) that is run. Task is an abstraction
-     * that takes any number of function like "things" and makes then runnable
+     * that takes a number of function like "things" and makes then runnable
      * via Task's @p run method.
      * 
      * @note
      * The task represents a work item, but it is not responsible for how the Task is
      * executed (when, on what thread, by what schedule, etc). By itself, Task is not
      * super useful. It is intended to be used in conjunction with a reactor or
-     * scheduler and is mostly a convenience wrapper for the user.
+     * scheduler and is mostly a convenience wrapper.
      * 
      * @see pembroke::Reactor
      * @see pembroke::Scheduler
@@ -36,35 +43,18 @@ namespace pembroke {
 
         std::variant<TaskFunc, TaskFuncWithCtx> m_task_function = util::nop_f;
 
-        // /**
-        //  * @brief Helper function to validate function-like "things" are safe to use with Task
-        //  * @tparam Func          The type of the function-like thing provided to Task
-        //  * @tparam is_predicate  Boolean literal if the function is a predicate function (returns a bool) or
-        //  *                       a normal task function (void return-type). Used to choose the correct validations.
-        //  */
-        // template<typename Func, bool is_predicate>
-        // constexpr void validate_task_func() noexcept {
-        //     if constexpr ( std::is_pointer_v<Func> ) {
-        //         using FuncDeref = typename std::remove_pointer_t<Func>;
-        //         Task::validate_task_func<FuncDeref, is_predicate>();
-        //     } else {
-        //         // Check that our function-like thing is invocable with no arguments
-        //         static_assert( std::is_invocable_v<Func>, "Task given a function-like value that is not invocable with no arguments" );
-
-        //         // Check return-types and that they don't throw
-        //         if constexpr ( is_predicate ) {
-        //             static_assert( std::is_invocable_r_v<bool, Func>, "Task given a function-like value that does not specify a boolean return type" );
-        //         } else {
-        //             static_assert( std::is_invocable_r_v<void, Func>, "Task given a function-like value that does not specify a void return type" );
-        //         }
-        //     }
-        //
 
     public:
 
         /**
-         * @brief
-         * TODO: Ensure that Func can also be an r-value reference (same with pre/post-condition setup functions)
+         * @brief Create a task object given a callable object `Func` by the user.
+         * 
+         * Construction will ensure that the callable object matches the expectations
+         * of how it will be called and will be stored internally as a std::function.
+         * 
+         * How or when the function is called is up to the owner of the Task object.
+         * 
+         * @param f The callable object to be run by the Task
          */
         template<typename Func>
         Task(Func &&f) {
@@ -90,27 +80,20 @@ namespace pembroke {
                     m_task_function = TaskFuncWithCtx { std::forward<Func>(f) };
                 }
             }
-            // /* Perform some type-level validations */
-            // Task::validate_task_func<Func, /*is_predicate=*/false>();
-
-            // /* Capture user-defined function "thing" in a std::function */
-            // m_task_function = [f]() -> void {
-            //     // TODO: smart-pointer classes not recognized by `is_pointer_v` function
-            //     if constexpr ( std::is_pointer_v<Func> ) {
-            //         typename std::remove_pointer_t<Func> &f_unwrapped = *f;
-            //         std::invoke(f_unwrapped);
-            //     } else {
-            //         std::invoke(f);
-            //     }
-            // };
         }
 
-        /* TODO: Rethink the interface for running functions.
+        /**
+         * @brief Execute the user-provided function stored within the task
          * 
-         *   - Do we want to also run pre/post conditions for tasks from here?
-         *   - If so, how does that change the interface for the scheduler?
+         * @note While the function is marked noexcept, it is possible that the
+         *       user-provided callable may throw. All errors will be caught within
+         *       the body of the run function and reported through the internal
+         *       logging system. However there will be no other external hooks to
+         *       indicate that an exception has been thrown.
+         * 
+         * @param ctx Context object optionally consumable by the user-provided function
          */
         void run(TaskContext &ctx) const noexcept;
-
     };
+
 } // namespace pembroke

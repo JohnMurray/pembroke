@@ -24,6 +24,12 @@ namespace pembroke {
             auto error = fmt::format("Unexpected exception occurred when executing a task: {}", ex.what());
             pembroke::logger::error(error);
         }
+        catch (...) {
+            pembroke::logger::error(
+                "Unexpected exception of unknown type when executing a task. "
+                "Detailed error information is not available"
+            );
+        }
     }
 
 } // namespace pembroke
