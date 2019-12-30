@@ -3,8 +3,8 @@
 #include <functional>
 #include <memory>
 
-#include "internal/forward_decls.hpp"
-#include "util/func.hpp"
+#include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/util/func.hpp"
 
 namespace pembroke {
 

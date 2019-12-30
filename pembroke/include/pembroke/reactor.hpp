@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <unordered_set>
 
-#include "event.hpp"
-#include "internal/forward_decls.hpp"
+#include "pembroke/event.hpp"
+#include "pembroke/internal/forward_decls.hpp"
 
 namespace pembroke {
     struct ReactorBuilder;

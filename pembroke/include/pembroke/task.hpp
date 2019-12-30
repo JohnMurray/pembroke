@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <variant>
 
-#include "util/func.hpp"
+#include "pembroke/util/func.hpp"
 
 namespace pembroke {
 

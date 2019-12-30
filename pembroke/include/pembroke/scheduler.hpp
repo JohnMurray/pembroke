@@ -6,8 +6,8 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include "reactor.hpp"
-#include "task.hpp"
+#include "pembroke/reactor.hpp"
+#include "pembroke/task.hpp"
 
 namespace pembroke {
     using namespace std::chrono_literals;
