@@ -8,7 +8,7 @@ extern "C" {
 
 /*
  * This file defines some common utilities that are useful to pembroke
- * but aren't genearlly useful outside of this class or at least aren't
+ * but aren't genearlly useful outside of this library or at least aren't
  * things that make sense to be part of the public API.
  */
 

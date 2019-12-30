@@ -3,8 +3,8 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include <unordered_map>
-#include <variant>
 
 #include "reactor.hpp"
 #include "task.hpp"
@@ -26,9 +26,12 @@ namespace pembroke {
      * The scheduler is a non-copyable, movable type that is available through the reactor
      * interface. Schedulers have a lifetime attached to the reactor and should never exist
      * outside the context of a reactor.
+     * 
+     * This is the default scheduler for Pembroke and is, by default, constructed with each
+     * Reactor instance.
      */
     class Scheduler {
-        /* To provide Reactor with acess to the private constructor. See @note on class */
+        /* To provide Reactor with acess to the private constructor. See class documentation. */
         friend Reactor;
 
     private:
@@ -81,6 +84,33 @@ namespace pembroke {
                                             const std::function<bool()> &until_op) noexcept;
 
     private:
+
+        // TODO: Define a templated method that takes a "function-like" thing
+        // TODO: Really determine what value Task is adding here (in this class). Really feels like nothing
+        template<typename ScheduldFunc, typename UserPredFunc>
+        [[nodiscard]]
+        std::shared_ptr<Event> schedule(ScheduldFunc f,
+            const timespan &delay,
+            bool do_repeat,
+            uint32_t repeat_count,
+            const timespan &interval,
+            UserPredFunc until_op) noexcept {
+            
+            /* Validate that the scheduled function and the until-predicate function are
+             * both "function-like", are nothrow, and match the exected type */
+            static_assert(std::is_function<ScheduldFunc>::value);
+            static_assert(std::is_nothrow_invocable_r<void, ScheduldFunc>::value);
+
+            static_assert(std::is_function<UserPredFunc>::value);
+            static_assert(std::is_nothrow_invocable_r<bool, UserPredFunc>::value);
+
+            // TODO: Determine the best way to store this "function-like" thing and try to use
+            // constexpr if's to selectively move/copy into whatever internal representation makes
+            // sense to help with performance.
+
+            return nullptr;
+        };
+
         /**
          * @brief Submit a task to run on a specific schedule configuration.
          * 
@@ -90,7 +120,8 @@ namespace pembroke {
         [[nodiscard]]
         std::shared_ptr<Event> schedule(const Task &t,
             const timespan &delay,
-            std::variant<bool, uint32_t> repeat,
+            bool do_repeat,
+            uint32_t repeat_count,
             const timespan &interval,
             std::function<bool()> until_op) noexcept;
 

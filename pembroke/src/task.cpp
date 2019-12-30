@@ -1,26 +1,28 @@
 #include "pembroke/task.hpp"
 
-#include <sstream>
+#include <exception>
+#include <type_traits>
+#include <fmt/format.h>
 
 #include "pembroke/internal/logging.hpp"
 
 namespace pembroke {
 
-    Task::Task(std::function<void()> f): m_f(f) {}
-
-    void Task::run() const noexcept {
+    void Task::run(TaskContext &ctx) const noexcept {
         try {
-            m_f();
-        } catch (const std::exception &ex) {
-            std::stringstream ss;
-            ss << "Uncaught exception encountered while running task: "
-               << ex.what();
-            logger::error(ss.str());
-        } catch (...) {
-            logger::error(
-                "Uncaught exception of an uknown type encountered "
-                "(not defined within class heirarchy of std::exception) "
-                "while running task");
+            std::visit([&ctx](auto &&arg) {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, TaskFunc>) {
+                    arg();
+                }
+                else if constexpr (std::is_same_v<T, TaskFuncWithCtx>) {
+                    arg(ctx);
+                }
+            }, m_task_function);
+        }
+        catch (const std::exception &ex) {
+            auto error = fmt::format("Unexpected exception occurred when executing a task: {}", ex.what());
+            pembroke::logger::error(error);
         }
     }
 

@@ -6,7 +6,8 @@ namespace pembroke {
 
     std::shared_ptr<Event> schedule(const Task &t,
         const timespan &delay,
-        std::variant<bool, uint32_t> repeat,
+        bool do_repeat,
+        uint32_t repeat_count,
         const timespan &interval,
         std::function<bool()> until_op) noexcept {
 
