@@ -5,8 +5,10 @@
 #include <type_traits>
 
 #include "pembroke/reactor.hpp"
+#include "pembroke/event/timer.hpp"
 
 using namespace std::chrono_literals;
+using namespace pembroke::event;
 
 
 // ---
@@ -97,66 +99,6 @@ TEST_CASE("Reactor stops post-run, repeatedly", "[reactor][execution]") {
 }
 
 // ---
-// Scheduled (Timed) Events
-// ---
-
-TEST_CASE("Schedule zero-wait timer", "[reactor][execution]") {
-    auto r = pembroke::reactor().build();
-    auto x = 0;
-
-    r->new_timer([&]() -> void {
-        x += 1;
-    }, 0s);
-
-    r->tick();
-    CHECK(x == 1);
-}
-
-TEST_CASE("Schedule delayed timer (blocking)", "[reactor][execution]") {
-    auto r = pembroke::reactor().build();
-    auto x = 0;
-
-    r->new_timer([&]() -> void {
-        x += 1;
-        r->stop();
-    }, 100us);
-
-    r->run_blocking();
-    CHECK(x == 1);
-}
-
-TEST_CASE("Schedule delayed timer (non-blocking)", "[reactor][execution]") {
-    auto r = pembroke::reactor().build();
-    auto x = 0;
-
-    r->new_timer([&]() -> void {
-        x += 1;
-    }, 100us);
-
-    r->tick();
-    CHECK(x == 0);
-
-    std::this_thread::sleep_for(10ms);
-
-    r->tick();
-    CHECK(x == 1);
-}
-
-TEST_CASE("Cancel a scheduled, delayed timer", "[reactor][execution]") {
-    auto r = pembroke::reactor().build();
-    auto x = 0;
-
-    auto e = r->new_timer([&]() -> void {
-        x += 1;
-    }, 10us);
-    e.cancel();
-
-    std::this_thread::sleep_for(10ms);
-    r->tick();
-    CHECK(x == 0);
-}
-
-// ---
 // Stop & Resume (with Events)
 // ---
 
@@ -164,13 +106,18 @@ TEST_CASE("Stop. Do not execute pending tasks", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    r->new_timer([&]() -> void { 
+    auto t1 = TimerEvent(10us, [&]() -> void { 
         x += 1;
         r->stop();
-    }, 10us);
-    r->new_timer([&]() -> void { x += 1; }, 100us);
-    r->new_timer([&]() -> void { x += 1; }, 100us);
-    r->new_timer([&]() -> void { x += 1; }, 100us);
+    });
+    auto t2 = TimerEvent(100us, [&]() -> void { x += 1; });
+    auto t3 = TimerEvent(100us, [&]() -> void { x += 1; });
+    auto t4 = TimerEvent(100us, [&]() -> void { x += 1; });
+
+    CHECK(r->register_event(t1));
+    CHECK(r->register_event(t2));
+    CHECK(r->register_event(t3));
+    CHECK(r->register_event(t4));
 
     std::this_thread::sleep_for(10ms);
     r->run_blocking();
@@ -181,13 +128,18 @@ TEST_CASE("Resume and execute pending tasks", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    r->new_timer([&]() -> void { 
+    auto t1 = TimerEvent(0us, [&]() -> void { 
         x += 1;
         r->stop();
-    }, 0us);
-    r->new_timer([&]() -> void { x += 1; }, 100us);
-    r->new_timer([&]() -> void { x += 1; }, 100us);
-    r->new_timer([&]() -> void { x += 1; }, 100us);
+    });
+    auto t2 = TimerEvent(100us, [&]() -> void { x += 1; });
+    auto t3 = TimerEvent(100us, [&]() -> void { x += 1; });
+    auto t4 = TimerEvent(100us, [&]() -> void { x += 1; });
+
+    CHECK(r->register_event(t1));
+    CHECK(r->register_event(t2));
+    CHECK(r->register_event(t3));
+    CHECK(r->register_event(t4));
 
     r->run_blocking();
     std::this_thread::sleep_for(10ms);
@@ -199,13 +151,22 @@ TEST_CASE("Schedule events while paused, execute on resumption", "[reactor][exec
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    r->new_timer([&]() -> void { 
+    std::shared_ptr<TimerEvent> t2;
+    std::shared_ptr<TimerEvent> t3;
+    std::shared_ptr<TimerEvent> t4;
+
+    auto t1 = TimerEvent(0us, [&]() -> void { 
         x += 1;
         r->stop();
-        r->new_timer([&]() -> void { x += 1; }, 0us);
-        r->new_timer([&]() -> void { x += 1; }, 0us);
-        r->new_timer([&]() -> void { x += 1; }, 0us);
-    }, 0us);
+        t2 = std::make_shared<TimerEvent>(0us, [&]() -> void { x += 1; });
+        t3 = std::make_shared<TimerEvent>(0us, [&]() -> void { x += 1; });
+        t4 = std::make_shared<TimerEvent>(0us, [&]() -> void { x += 1; });
+
+        CHECK(r->register_event(*t2));
+        CHECK(r->register_event(*t3));
+        CHECK(r->register_event(*t4));
+    });
+    CHECK(r->register_event(t1));
 
     r->tick(); // stopped on first tick
     r->tick(); // execute events schedule post-stop

@@ -1,5 +1,5 @@
 #include "pembroke/reactor.hpp"
-#include "pembroke/scheduler.hpp"
+#include "pembroke/internal/util.hpp"
 
 #include <memory>
 
@@ -117,45 +117,10 @@ namespace pembroke {
         return (ret == LOOP_RAN_SUCCESSFULLY) || (ret == LOOP_RAN_NO_EVENTS);
     }
 
-    const Event Reactor::new_timer(
-        const std::function<void()> &cb,
-        const std::chrono::duration<long, std::micro> &delay) noexcept {
-
-        timeval tv {.tv_usec = static_cast<int>(delay.count()) };
-        auto ctx = std::make_shared<EventContext>(++m_event_index, cb);
-        auto event = evtimer_new(m_base.get(), Reactor::run_timer_cb, ctx.get());
-
-        /* Configure the context and store in the reactor to reference back to later */
-        ctx->event = event;
-        ctx->post_event_cleanup = [event, this, ctx]() -> void {
-            this->m_timers.erase(ctx);
-            event_free(event);
-            ctx->event = nullptr;
-        };
-        m_timers.insert(ctx);
-
-        /* Schedule event to run with provided delay (time-value) */
-        evtimer_add(event, &tv);
-
-        /* Return an event object to give the user a way to cancel the event
-         * before it is executed. */
-        return Event([ctx, this]() -> bool {
-            bool ret = true;
-            if (ctx->event != nullptr) {
-                auto ev = const_cast<struct event*>(ctx->event);
-                ret = evtimer_del(ev) == 0;
-                event_free(ev);
-                this->m_timers.erase(ctx);
-            }
-            return ret;
-        });
+    
+    bool Reactor::register_event(pembroke::Event &event) noexcept {
+        return event.register_event(*m_base);
     }
 
-    void Reactor::run_timer_cb(int, short, void* cb) {
-        auto ctx = static_cast<EventContext *>(cb);
-        ctx->callback();
-        ctx->post_event_cleanup();
-        ctx->post_event_cleanup = util::nop_f;
-    }
 
 } // namespace pembroke

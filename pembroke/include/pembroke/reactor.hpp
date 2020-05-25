@@ -24,9 +24,6 @@ namespace pembroke {
         friend class Scheduler;
     private:
         reactor_base m_base{nullptr, nullptr};
-        std::unordered_set<std::shared_ptr<EventContext>, EventContextHash> m_timers;
-
-        uint32_t m_event_index = 0;
 
     public:
         /**
@@ -93,35 +90,8 @@ namespace pembroke {
         bool stop() const noexcept;
 
 
-        /**
-         * @brief Schedule some call-back to run after a short duration
-         * 
-         * @note This function is rather low-level/simple and is especially useful
-         *       if you are looking to build additional functionality on top of it.
-         *       If you're looking for general purpose task scheduling, take a look
-         *       at `scheduler`.
-         * 
-         * @see scheduler
-         * 
-         * @param cb     The callback to run once the timer expires
-         * @param delay  The time to delay before running the callback
-         * 
-         * @returns Event object which can be used to cancel the event before it
-         *          is executed.
-         */
-        const Event new_timer(
-            const std::function<void()> &cb,
-            const std::chrono::duration<long, std::micro> &delay) noexcept;
-        
-    private:
-
-        /** 
-         * @brief Helper function used by `new_timer` in executing the user-supplied
-         *        callback within libevent.
-         *  @see new_timer
-         */
-        static void run_timer_cb(int, short, void *);
-
+        [[nodiscard]]
+        bool register_event(pembroke::Event &event) noexcept;
     };
 
     /** 

@@ -10,11 +10,11 @@ conan_basic_setup()
 add_library(pembroke
     src/buffer.cpp
     src/event.cpp
+    src/event/timer.cpp
     src/http/request.cpp
     src/internal/logging.cpp
+    src/internal/util.cpp
     src/reactor.cpp
-    src/scheduler.cpp
-    src/task.cpp
 )
 set_property(TARGET pembroke PROPERTY CXX_STANDARD 17)
 target_link_libraries(pembroke
@@ -37,8 +37,8 @@ add_executable(tests
     src/buffer_test.cpp
     src/event_test.cpp
     src/internal/logging_test.cpp
+    src/internal/util_test.cpp
     src/reactor_test.cpp
-    src/task_test.cpp
 
     src/internal/test_common.cpp
 )
