@@ -8,19 +8,32 @@
 
 namespace pembroke::event {
 
+    /**
+     * @brief A repeating event that triggers every user-defined interval
+     * 
+     * Useful for creating repeating tasks such as maintenance/cleanup tasks, data-updates,
+     * metric/log flushing, etc. The timer will start as soon as it is registered with the
+     * reactor and will re-run at a specified interval _after_ completion.
+     * 
+     * Ex: If a timer is created to run every 5s and takes 2s to complete, scheduling will
+     *     look like:
+     *       |**|-----|**|-----|**|-----|**|...
+     *     The 5s timer does not start until the callback completes.
+     */
     class TimerEvent final
         : public Event,
           public EventCancellation
     {
-        std::chrono::duration<long, std::micro> m_delay;
+        std::chrono::duration<long, std::micro> m_interval;
         std::function<void()> m_callback;
         struct event *m_timer_event = nullptr;
         bool m_canceled = false;
+        bool m_first_run = true;
 
     public:
 
-        TimerEvent(std::chrono::duration<long, std::micro> delay, std::function<void()> callback)
-            : m_delay(delay), m_callback(callback) {}
+        TimerEvent(std::chrono::duration<long, std::micro> interval, std::function<void()> callback)
+            : m_interval(interval), m_callback(callback) {}
 
         ~TimerEvent();
 

@@ -16,7 +16,7 @@ extern "C" {
 
 namespace pembroke::internal {
 
-    constexpr static int MILLIS_IN_SECOND = 1000000;
+    constexpr static int MICR0S_IN_SECOND = 1000000;
 
     /**
      * @brief Convert a chrono duration into a C-style timeval struct
@@ -48,7 +48,7 @@ namespace pembroke::internal {
  * for production builds. Represents invariants. */
 #define ASSERT_RELEASE(cond, msg)                 \
     do {                                          \
-        if (!(cond)) {                              \
+        if (!(cond)) {                            \
             auto error = fmt::format(             \
                 "assert failure: ({}) {}",        \
                 #cond, msg);                      \

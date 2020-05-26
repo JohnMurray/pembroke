@@ -10,6 +10,7 @@ conan_basic_setup()
 add_library(pembroke
     src/buffer.cpp
     src/event.cpp
+    src/event/delayed.cpp
     src/event/timer.cpp
     src/http/request.cpp
     src/internal/logging.cpp
@@ -35,7 +36,7 @@ add_executable(tests
     src/main_test.cpp
 
     src/buffer_test.cpp
-    src/event_test.cpp
+    src/event/delayed_test.cpp
     src/internal/logging_test.cpp
     src/internal/util_test.cpp
     src/reactor_test.cpp

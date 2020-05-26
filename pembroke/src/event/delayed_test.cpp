@@ -4,20 +4,20 @@
 #include <type_traits>
 
 #include "pembroke/reactor.hpp"
-#include "pembroke/event/timer.hpp"
+#include "pembroke/event/delayed.hpp"
 
 using namespace std::chrono_literals;
 using namespace pembroke::event;
 
 //-----------------------------------------------------------------------------
-// Timer Event Tests
+// Delayed Event Tests
 //-----------------------------------------------------------------------------
 
 TEST_CASE("Schedule zero-wait timer", "[reacto(r][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto event = TimerEvent(0s, [&]() -> void {
+    auto event = DelayedEvent(0s, [&]() -> void {
         x += 1;
     });
     CHECK(r->register_event(event));
@@ -30,7 +30,7 @@ TEST_CASE("Schedule delayed timer (blocking)", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto event = TimerEvent(100us, [&]() -> void {
+    auto event = DelayedEvent(100us, [&]() -> void {
         x += 1;
         r->stop();
     });
@@ -44,7 +44,7 @@ TEST_CASE("Schedule delayed timer (non-blocking)", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto event = TimerEvent(100us, [&]() -> void {
+    auto event = DelayedEvent(100us, [&]() -> void {
         x += 1;
     });
     CHECK(r->register_event(event));
@@ -62,7 +62,7 @@ TEST_CASE("Cancel a scheduled, delayed timer", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto event = TimerEvent(10us, [&]() -> void {
+    auto event = DelayedEvent(10us, [&]() -> void {
         x += 1;
     });
     CHECK(r->register_event(event));
@@ -77,7 +77,7 @@ TEST_CASE("Cancel a scheduled, delayed timer before registration", "[reactor][ex
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto event = TimerEvent(10us, [&]() -> void {
+    auto event = DelayedEvent(10us, [&]() -> void {
         x += 1;
     });
     CHECK(event.cancel());

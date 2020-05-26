@@ -5,7 +5,7 @@
 #include <type_traits>
 
 #include "pembroke/reactor.hpp"
-#include "pembroke/event/timer.hpp"
+#include "pembroke/event/delayed.hpp"
 
 using namespace std::chrono_literals;
 using namespace pembroke::event;
@@ -106,13 +106,13 @@ TEST_CASE("Stop. Do not execute pending tasks", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto t1 = TimerEvent(10us, [&]() -> void { 
+    auto t1 = DelayedEvent(10us, [&]() -> void { 
         x += 1;
         r->stop();
     });
-    auto t2 = TimerEvent(100us, [&]() -> void { x += 1; });
-    auto t3 = TimerEvent(100us, [&]() -> void { x += 1; });
-    auto t4 = TimerEvent(100us, [&]() -> void { x += 1; });
+    auto t2 = DelayedEvent(100us, [&]() -> void { x += 1; });
+    auto t3 = DelayedEvent(100us, [&]() -> void { x += 1; });
+    auto t4 = DelayedEvent(100us, [&]() -> void { x += 1; });
 
     CHECK(r->register_event(t1));
     CHECK(r->register_event(t2));
@@ -128,13 +128,13 @@ TEST_CASE("Resume and execute pending tasks", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    auto t1 = TimerEvent(0us, [&]() -> void { 
+    auto t1 = DelayedEvent(0us, [&]() -> void { 
         x += 1;
         r->stop();
     });
-    auto t2 = TimerEvent(100us, [&]() -> void { x += 1; });
-    auto t3 = TimerEvent(100us, [&]() -> void { x += 1; });
-    auto t4 = TimerEvent(100us, [&]() -> void { x += 1; });
+    auto t2 = DelayedEvent(100us, [&]() -> void { x += 1; });
+    auto t3 = DelayedEvent(100us, [&]() -> void { x += 1; });
+    auto t4 = DelayedEvent(100us, [&]() -> void { x += 1; });
 
     CHECK(r->register_event(t1));
     CHECK(r->register_event(t2));
@@ -151,16 +151,16 @@ TEST_CASE("Schedule events while paused, execute on resumption", "[reactor][exec
     auto r = pembroke::reactor().build();
     auto x = 0;
 
-    std::shared_ptr<TimerEvent> t2;
-    std::shared_ptr<TimerEvent> t3;
-    std::shared_ptr<TimerEvent> t4;
+    std::shared_ptr<DelayedEvent> t2;
+    std::shared_ptr<DelayedEvent> t3;
+    std::shared_ptr<DelayedEvent> t4;
 
-    auto t1 = TimerEvent(0us, [&]() -> void { 
+    auto t1 = DelayedEvent(0us, [&]() -> void { 
         x += 1;
         r->stop();
-        t2 = std::make_shared<TimerEvent>(0us, [&]() -> void { x += 1; });
-        t3 = std::make_shared<TimerEvent>(0us, [&]() -> void { x += 1; });
-        t4 = std::make_shared<TimerEvent>(0us, [&]() -> void { x += 1; });
+        t2 = std::make_shared<DelayedEvent>(0us, [&]() -> void { x += 1; });
+        t3 = std::make_shared<DelayedEvent>(0us, [&]() -> void { x += 1; });
+        t4 = std::make_shared<DelayedEvent>(0us, [&]() -> void { x += 1; });
 
         CHECK(r->register_event(*t2));
         CHECK(r->register_event(*t3));

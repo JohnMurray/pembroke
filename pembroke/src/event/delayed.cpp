@@ -1,8 +1,7 @@
-#include "pembroke/event/timer.hpp"
+#include "pembroke/event/delayed.hpp"
 
 #include "pembroke/internal/logging.hpp"
 #include "pembroke/internal/util.hpp"
-#include "pembroke/util.hpp"
 
 extern "C" {
 #include <event2/event.h>
@@ -10,13 +9,13 @@ extern "C" {
 
 namespace pembroke::event {
 
-    TimerEvent::~TimerEvent() {
+    DelayedEvent::~DelayedEvent() {
         close_timer();
     }
 
 
     [[nodiscard]]
-    bool TimerEvent::register_event(event_base &base) noexcept {
+    bool DelayedEvent::register_event(event_base &base) noexcept {
         // If we have canceled before registration, fail registration
         if (m_canceled) {
             pembroke::logger::warn("Attempting to register cancled timer-event");
@@ -29,22 +28,22 @@ namespace pembroke::event {
             return false;
         }
 
-        timeval tv = internal::to_timeval(m_first_run ? no_delay : m_interval);
-        m_timer_event = evtimer_new(&base, TimerEvent::run_timer_cb, this);
+        timeval tv = internal::to_timeval(m_delay);
+        m_timer_event = evtimer_new(&base, DelayedEvent::run_timer_cb, this);
         int ret = evtimer_add(m_timer_event, &tv);
 
         return ret == 0;
     }
 
-    bool TimerEvent::cancel() noexcept {
+    bool DelayedEvent::cancel() noexcept {
         return close_timer();
     }
 
-    bool TimerEvent::canceled() noexcept {
+    bool DelayedEvent::canceled() noexcept {
         return m_canceled;
     }
 
-    bool TimerEvent::close_timer() noexcept {
+    bool DelayedEvent::close_timer() noexcept {
         bool ret = true;
         if (m_timer_event != nullptr) {
             ret = evtimer_del(m_timer_event) == 0;
@@ -58,19 +57,13 @@ namespace pembroke::event {
         return ret;
     }
 
-    void TimerEvent::run_timer_cb(int, short, void* cb) noexcept {
+    void DelayedEvent::run_timer_cb(int, short, void* cb) noexcept {
         ASSERT_RELEASE(cb != nullptr, "Timer event called with null timer object");
-        auto self = static_cast<TimerEvent *>(cb);
-        if (!self->m_canceled) {
+        auto self = static_cast<DelayedEvent *>(cb);
+        if (self->m_timer_event != nullptr) {
             self->m_callback();
+            self->close_timer();
         }
-
-        // Register next iterations of the timer
-        self->m_first_run = false;
-        auto *base = event_get_base(self->m_timer_event);
-        ASSERT_DEBUG(base != nullptr, "Attempting to register timer on inactive event base");
-        auto ret = self->register_event(*base);
-        ASSERT_DEBUG(ret, "Failed to update timer event on the reactor");
     }
 
 } // namespace pembroke::event
