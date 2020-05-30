@@ -34,10 +34,11 @@ timed event to do some work and stop the loop as such:
 
    auto r = pembroke::reactor().build();
    
-   r->new_timer([&r]() -> void {
+   auto event = pembroke::event::DelayedEvent(100us, [&r]() -> void {
        std::cout << "Hello, from a timer\n";
        r->stop();
-   }, 100us);
+   });
+   r->register_event(event);
    
    r->run_blocking();
 
@@ -59,5 +60,5 @@ we'll need to call this function again.
 
 ----
 
-Now that you've gotten a simple reactor up and running see :ref:`timers_schedules`,
+Now that you've gotten a simple reactor up and running see :ref:`timers_events`,
 :ref:`file_io`, and :ref:`network_io` to see what you can do with it.

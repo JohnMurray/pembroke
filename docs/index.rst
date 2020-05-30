@@ -27,7 +27,7 @@ be helpful to get up and running with your application.
    installing
    getting-started
    logging
-   timers_schedules
+   timers_events
    file_io
    network_io
 
@@ -38,6 +38,7 @@ be helpful to get up and running with your application.
 
     Reactor <api/reactor>
     Buffer <api/buffer>
+    Events <api/event>
 
 Indices and tables
 ==================

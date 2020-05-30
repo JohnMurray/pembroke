@@ -42,7 +42,7 @@ if read_the_docs_build:
 # -- Project information -----------------------------------------------------
 
 project = 'Pembroke'
-copyright = '2019, John Murray'
+copyright = '2020, John Murray'
 author = 'John Murray'
 
 # The full version, including alpha/beta/rc tags

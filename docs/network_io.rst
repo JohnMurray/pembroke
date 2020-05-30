@@ -5,4 +5,4 @@ Network I/O
 ===========
 
 
-**TODO** Write documentation
+**XXX** Not currently implemented

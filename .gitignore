@@ -1,6 +1,7 @@
 # Editor Files
 .vscode/
 *.swp
+.idea/
 
 # Build Artifacts/Directories
 build/
