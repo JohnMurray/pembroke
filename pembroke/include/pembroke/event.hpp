@@ -6,7 +6,6 @@
 
 #include "pembroke/internal/forward_decls.hpp"
 #include "pembroke/internal/lang_macros.hpp"
-#include "pembroke/util/func.hpp"
 
 namespace pembroke {
 
