@@ -5,6 +5,7 @@
 
 #include "pembroke/event.hpp"
 #include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/util.hpp"
 
 namespace pembroke::event {
 
@@ -12,14 +13,14 @@ namespace pembroke::event {
         : public Event,
           public EventCancellation
     {
-        std::chrono::duration<long, std::micro> m_delay;
+        duration m_delay;
         std::function<void()> m_callback;
         struct event *m_timer_event = nullptr;
         bool m_canceled = false;
 
     public:
 
-        DelayedEvent(std::chrono::duration<long, std::micro> delay, std::function<void()> callback)
+        DelayedEvent(duration delay, std::function<void()> callback)
             : m_delay(delay), m_callback(callback) {}
 
         ~DelayedEvent();

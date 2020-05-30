@@ -25,8 +25,8 @@ namespace pembroke::event {
         : public Event,
           public EventCancellation
     {
-        std::chrono::duration<long, std::micro> m_initial_delay;
-        std::chrono::duration<long, std::micro> m_interval;
+        duration m_initial_delay;
+        duration m_interval;
         std::function<void()> m_callback;
         struct event *m_timer_event = nullptr;
         bool m_canceled = false;
@@ -34,12 +34,10 @@ namespace pembroke::event {
 
     public:
 
-        TimerEvent(std::chrono::duration<long, std::micro> interval, std::function<void()> callback)
+        TimerEvent(duration interval, std::function<void()> callback)
             : m_interval(interval), m_callback(callback), m_initial_delay(no_delay) {}
 
-        TimerEvent(std::chrono::duration<long, std::micro> initial_delay,
-            std::chrono::duration<long, std::micro> interval,
-            std::function<void()> callback)
+        TimerEvent(duration initial_delay, duration interval, std::function<void()> callback)
             : m_interval(interval), m_initial_delay(initial_delay), m_callback(callback) {}
 
         ~TimerEvent();
