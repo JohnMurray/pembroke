@@ -4,7 +4,7 @@
 #include <functional>
 
 #include "pembroke/event.hpp"
-#include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/libevent/forward_decls.hpp"
 #include "pembroke/util.hpp"
 
 namespace pembroke::event {

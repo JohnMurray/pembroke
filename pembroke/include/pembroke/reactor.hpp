@@ -6,7 +6,7 @@
 #include <unordered_set>
 
 #include "pembroke/event.hpp"
-#include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/libevent/forward_decls.hpp"
 
 namespace pembroke {
     struct ReactorBuilder;

@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string_view>
 
-#include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/libevent/forward_decls.hpp"
 
 namespace pembroke {
 

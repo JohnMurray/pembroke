@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/libevent/forward_decls.hpp"
 #include "pembroke/internal/lang_macros.hpp"
 
 namespace pembroke {
