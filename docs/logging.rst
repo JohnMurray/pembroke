@@ -22,12 +22,12 @@ following to your code:
   
    using namespace pembroke;
   
-   logger::register_handler([&my_logger](logger::Level l, std::string_view msg) -> void {
-       if (l == logger::Level::Error) {
+   logger::register_handler([&my_logger](logger::Level lvl, std::string_view msg) -> void {
+       if (lvl == logger::Level::Error) {
            my_logger.error(msg);
        }
    });
 
-If multiple handlers are registered, only the last one will be used. If multi-dispatch
-logging is a feature required by your application, you'll need to handle that yourself
-within your logging hook.
+If multiple handlers are registered, only the last one will be used. If you require the use
+of multiple loggers, you'll need to wire this up yourself in the handlers. Although this should
+not be a common use-case.

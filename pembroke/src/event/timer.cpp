@@ -2,7 +2,6 @@
 
 #include "pembroke/internal/logging.hpp"
 #include "pembroke/internal/util.hpp"
-#include "pembroke/util.hpp"
 
 extern "C" {
 #include <event2/event.h>
@@ -29,7 +28,7 @@ namespace pembroke::event {
             return false;
         }
 
-        timeval tv = internal::to_timeval(m_first_run ? no_delay : m_interval);
+        timeval tv = internal::to_timeval(m_first_run ? m_initial_delay : m_interval);
         m_timer_event = evtimer_new(&base, TimerEvent::run_timer_cb, this);
         int ret = evtimer_add(m_timer_event, &tv);
 
@@ -37,6 +36,7 @@ namespace pembroke::event {
     }
 
     bool TimerEvent::cancel() noexcept {
+        m_canceled = true;
         return close_timer();
     }
 
@@ -51,23 +51,30 @@ namespace pembroke::event {
             event_free(m_timer_event);
             m_timer_event = nullptr;
         }
-
-        // always set internal canceled flag
-        m_canceled = true;
-
         return ret;
     }
 
     void TimerEvent::run_timer_cb(int, short, void* cb) noexcept {
         ASSERT_RELEASE(cb != nullptr, "Timer event called with null timer object");
         auto self = static_cast<TimerEvent *>(cb);
-        if (!self->m_canceled) {
-            self->m_callback();
+        if (self->m_canceled) {
+            // cleanup should have already been taken care of, so just
+            // exit early and avoid any sort of re-registering logic
+            return;
         }
 
-        // Register next iterations of the timer
-        self->m_first_run = false;
+        self->m_callback();
+
+        /* Capture base of current timer. Assume that we can re-register on
+         * the same base. */
         auto *base = event_get_base(self->m_timer_event);
+
+        // Perform cleanup for current timer
+        self->close_timer();
+        self->m_first_run = false;
+        self->m_canceled = false;
+
+        // Register next iterations of the timer
         ASSERT_DEBUG(base != nullptr, "Attempting to register timer on inactive event base");
         auto ret = self->register_event(*base);
         ASSERT_DEBUG(ret, "Failed to update timer event on the reactor");

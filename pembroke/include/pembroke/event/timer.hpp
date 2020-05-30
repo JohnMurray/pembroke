@@ -5,6 +5,7 @@
 
 #include "pembroke/event.hpp"
 #include "pembroke/internal/forward_decls.hpp"
+#include "pembroke/util.hpp"
 
 namespace pembroke::event {
 
@@ -24,6 +25,7 @@ namespace pembroke::event {
         : public Event,
           public EventCancellation
     {
+        std::chrono::duration<long, std::micro> m_initial_delay;
         std::chrono::duration<long, std::micro> m_interval;
         std::function<void()> m_callback;
         struct event *m_timer_event = nullptr;
@@ -33,7 +35,12 @@ namespace pembroke::event {
     public:
 
         TimerEvent(std::chrono::duration<long, std::micro> interval, std::function<void()> callback)
-            : m_interval(interval), m_callback(callback) {}
+            : m_interval(interval), m_callback(callback), m_initial_delay(no_delay) {}
+
+        TimerEvent(std::chrono::duration<long, std::micro> initial_delay,
+            std::chrono::duration<long, std::micro> interval,
+            std::function<void()> callback)
+            : m_interval(interval), m_initial_delay(initial_delay), m_callback(callback) {}
 
         ~TimerEvent();
 

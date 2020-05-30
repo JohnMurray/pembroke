@@ -9,11 +9,7 @@
 using namespace std::chrono_literals;
 using namespace pembroke::event;
 
-//-----------------------------------------------------------------------------
-// Delayed Event Tests
-//-----------------------------------------------------------------------------
-
-TEST_CASE("Schedule zero-wait timer", "[reacto(r][execution]") {
+TEST_CASE("Schedule zero-wait delayed event", "[event][delayed][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
@@ -26,7 +22,7 @@ TEST_CASE("Schedule zero-wait timer", "[reacto(r][execution]") {
     CHECK(x == 1);
 }
 
-TEST_CASE("Schedule delayed timer (blocking)", "[reactor][execution]") {
+TEST_CASE("Schedule delayed event (blocking)", "[event][delayed][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
@@ -40,7 +36,7 @@ TEST_CASE("Schedule delayed timer (blocking)", "[reactor][execution]") {
     CHECK(x == 1);
 }
 
-TEST_CASE("Schedule delayed timer (non-blocking)", "[reactor][execution]") {
+TEST_CASE("Schedule delayed event (non-blocking)", "[event][delayed][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
@@ -58,7 +54,7 @@ TEST_CASE("Schedule delayed timer (non-blocking)", "[reactor][execution]") {
     CHECK(x == 1);
 }
 
-TEST_CASE("Cancel a scheduled, delayed timer", "[reactor][execution]") {
+TEST_CASE("Cancel a scheduled, delayed event", "[event][delayed][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
@@ -73,7 +69,7 @@ TEST_CASE("Cancel a scheduled, delayed timer", "[reactor][execution]") {
     CHECK(x == 0);
 }
 
-TEST_CASE("Cancel a scheduled, delayed timer before registration", "[reactor][execution]") {
+TEST_CASE("Cancel a scheduled, delayed event before registration", "[event][delayed][execution]") {
     auto r = pembroke::reactor().build();
     auto x = 0;
 
