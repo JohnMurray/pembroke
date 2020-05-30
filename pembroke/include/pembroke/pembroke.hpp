@@ -10,3 +10,5 @@
 #include "pembroke/logging.hpp"
 #include "pembroke/reactor.hpp"
 #include "pembroke/util.hpp"
+#include "pembroke/event/timer.hpp"
+#include "pembroke/event/delayed.hpp"

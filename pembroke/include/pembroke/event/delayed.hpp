@@ -9,6 +9,13 @@
 
 namespace pembroke::event {
 
+    /**
+     * A one-time event that will execute after an initial delay. Represents the most
+     * basic event type.
+     * 
+     * Useful for defering actions, implementing timeout behaviors for asynchronous
+     * events, or building more complex event types.
+     */
     class DelayedEvent final
         : public Event,
           public EventCancellation
@@ -20,6 +27,10 @@ namespace pembroke::event {
 
     public:
 
+        /**
+         * Construct a Delayed event that executes ``callback`` after an initial duration
+         * ``delay``.
+         */
         DelayedEvent(duration delay, std::function<void()> callback)
             : m_delay(delay), m_callback(callback) {}
 

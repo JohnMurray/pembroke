@@ -10,16 +10,23 @@
 namespace pembroke::event {
 
     /**
-     * @brief A repeating event that triggers every user-defined interval
+     * A repeating event that triggers every user-defined interval
      * 
      * Useful for creating repeating tasks such as maintenance/cleanup tasks, data-updates,
      * metric/log flushing, etc. The timer will start as soon as it is registered with the
-     * reactor and will re-run at a specified interval _after_ completion.
+     * reactor (or with a delay if specified) and will re-run at the specified interval
+     * _after_ completion.
      * 
-     * Ex: If a timer is created to run every 5s and takes 2s to complete, scheduling will
-     *     look like:
-     *       |**|-----|**|-----|**|-----|**|...
-     *     The 5s timer does not start until the callback completes.
+     * **Example:** If a timer is created to run every 5s and takes 2s to complete,
+     * scheduling will look like:
+     * 
+     *     |**|-----|**|-----|**|-----|**|...
+     *     
+     *     * == 1s running
+     *     - == 1s waiting
+     * 
+     * The 5s timer does not start until the callback completes. So in this scenario, the times
+     * at which a task starts may be 7s apart each time.
      */
     class TimerEvent final
         : public Event,
@@ -34,9 +41,17 @@ namespace pembroke::event {
 
     public:
 
+        /**
+         * @brief Construct a Timer that executes ``callback`` immediately and then
+         * every ``interval``.
+         */
         TimerEvent(duration interval, std::function<void()> callback)
             : m_interval(interval), m_callback(callback), m_initial_delay(no_delay) {}
 
+        /**
+         * @brief Construct a timer that execute ``callback`` after an initial duration of
+         * ``initial_delay` and then every ``interval``.
+         */
         TimerEvent(duration initial_delay, duration interval, std::function<void()> callback)
             : m_interval(interval), m_initial_delay(initial_delay), m_callback(callback) {}
 

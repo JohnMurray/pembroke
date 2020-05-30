@@ -27,7 +27,7 @@ be helpful to get up and running with your application.
    installing
    getting-started
    logging
-   timers_schedules
+   timers_events
    file_io
    network_io
 

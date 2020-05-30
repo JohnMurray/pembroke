@@ -1,17 +1,19 @@
+.. _api/event:
+
 ======
 Events
 ======
 
 .. highlight:: c++
 
-Events are a central data-type to "eventing" libraries such as `libevent`_. Whenever you
-trigger an action that has a delayed response, such as setting a timer or reading from the
-network, an event is involved.
+Events are (currently) manually triggerd/scheduled callbacks. There exist two event
+types of events, a delayed event and a timer event. Both event-types will run user-defined
+callbacks. Delayed events represent single-execution callbakcks while timers represent
+recurring actions.
 
-Events are essentially a handle representing your callback. While they cannot be composed
-as you might do with higher level constructs such as a ``Future`` or ``Pomise``, they can
-be canceled which can be useful if developing higher level abstractions on top of
-``Event``.
+Events are created and then must be registered on the reactor in order to be scheduled for
+execution. Once registered, they can be cancelled and they exist as RAII types, so destructing
+the object will also cause the callback to be de-registered from the reactor.
 
 **Example**
 
@@ -21,50 +23,24 @@ be canceled which can be useful if developing higher level abstractions on top o
    auto reactor = pembroke::reactor().build();
    auto x = 0;
 
-   auto event = reactor->new_timer([&]() -> void {
+   auto event = pembroke::event::TimerEvent(100us, [&]() -> void {
        x += 1;
-   }, 100us);
+   });
+   reactor->register_event(event);
 
-If this event is not canceled, then in 100 micro-seconds the callback will run and ``x`` will
-have a value of 1. Cancelling the event *may* prevent this from happening if done before the
-callback triggers.
+If this event is not canceled or destructe******d it will run on the next iteration of the reactor's
+event-loop and will continue to run every 100 microseconds.
 
-.. code-block::
-   :linenos:
+**************
+**TimerEvent**
+**************
 
-   event->cancel();
-   assert(x == 0);
-
-   // OR if called after
-
-   std::this_thread.sleep_for(200us);
-   reactor->tick();
-   bool ret = event->cancel();
-
-   assert(ret == true); // successfully called cancel
-   assert(x == 1);      // BUT still ran event because it was cancelled too late
-
-
-*******************
-``pembroke::Event``
-*******************
-
-.. doxygenclass:: pembroke::Event
+.. doxygenclass:: pembroke::event::TimerEvent
    :members:
 
-**************************
-``pembroke::EventContext``
-**************************
+****************
+**DelayedEvent**
+****************
 
-.. doxygenstruct:: pembroke::EventContext
+.. doxygenclass:: pembroke::event::DelayedEvent
    :members:
-
-******************************
-``pembroke::EventContextHash``
-******************************
-
-.. doxygenstruct:: pembroke::EventContextHash
-   :members:
-
-
-.. _libevent: https://libevent.org/

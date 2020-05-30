@@ -18,9 +18,18 @@ namespace pembroke {
     };
 
     class EventCancellation {
+
+        /**
+         * @brief Cancels the event. Callbacks on the event should not run after
+         * cancel has been called (assuming cancellation suceeds).
+         */
         [[nodiscard]]
         virtual bool cancel() noexcept PURE;
 
+        /**
+         * @brief Returns bool indicating if the event has been canceled.
+         * @note Does not take into account event's registration status.
+         */
         [[nodiscard]]
         virtual bool canceled() noexcept PURE;
     };
