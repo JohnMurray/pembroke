@@ -1,12 +1,9 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: ubuntu:19.10
-
+version: 2.1
+commands:
+  image_setup:
+    description: 'Setup the container image for all CI runs'
     steps:
       - checkout
-
       - run:
           name: Update APT Repos
           command: apt-get update
@@ -26,15 +23,31 @@ jobs:
       - run:
           name: Doc Tools Setup
           command: apt-get install -y doxygen && pip install -U sphinx breathe sphinx_rtd_theme
-      
+  build_pembroke:
+    description: 'Build pembroke'
+    parameters:
+      sanitizer:
+        type: string
+        default: none
+      build_mode:
+        type: string
+        default: debug
+    steps:
       - run:
           name: CMake Setup
-          command: cd build && cmake ..
-      
+          command: ./.circleci/cmake_setup.sh --with-sanitizer '<< parameters.sanitizer >>' --compilation-mode '<< parameters.build_mode >>'
       - run:
-          name: Compile
+          name: Build Library
           command: cd build && make
-      
       - run:
-          name: CTest
+          name: Test Library
           command: cd build && make test
+
+jobs:
+  build:
+    docker:
+      - image: ubuntu:19.10
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: none
