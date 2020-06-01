@@ -1,4 +1,11 @@
 version: 2.1
+
+# Define image to run all builds/tests under
+executors:
+  docker_ubuntu:
+    docker:
+      - image: ubuntu:19.10
+
 commands:
   image_setup:
     description: 'Setup the container image for all CI runs'
@@ -44,10 +51,58 @@ commands:
           command: cd build && make test
 
 jobs:
+  # Compile and test with all optimizations, do not run with any
+  # sanitizers
   build:
-    docker:
-      - image: ubuntu:19.10
+    executor: docker_ubuntu
     steps:
       - image_setup
       - build_pembroke:
-          sanitizer: none
+          build_mode: release
+
+  # ASAN build/test in debug mode
+  test_asan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: asan
+
+  # TSAN build/test in debug mode
+  test_tsan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: tsan
+
+  # MSAN build/test in debug mode
+  test_msan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: msan
+
+  # UBSAN build/test in debug mode
+  test_ubsan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: ubsan
+
+
+workflows:
+  version: 2
+  ci_workflow:
+    jobs:
+      - build
+      - test_asan:
+          requires: [build]
+      - test_tsan:
+          requires: [build]
+      - test_msan:
+          requires: [build]
+      - test_ubsan:
+          requires: [build]
