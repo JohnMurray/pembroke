@@ -45,7 +45,7 @@ commands:
           command: ./.circleci/cmake_setup.sh --with-sanitizer '<< parameters.sanitizer >>' --compilation-mode '<< parameters.build_mode >>'
       - run:
           name: Build Library
-          command: cd build && make
+          command: cd build && make -j 2
       - run:
           name: Test Library
           command: cd build && make test
