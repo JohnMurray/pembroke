@@ -37,10 +37,6 @@ function set_sanitizer_flags() { local sanitizer=$1;
             info "Running test with TSAN support"
             SANITIZER_FLAGS="${SANITIZER_FLAGS} -DENABLE_TSAN=ON"
             ;;
-        msan)
-            info "Running test with MSAN support"
-            SANITIZER_FLAGS="${SANITIZER_FLAGS} -DENABLE_MSAN=ON"
-            ;;
         ubsan)
             info "Running test with UBSAN support"
             SANITIZER_FLAGS="${SANITIZER_FLAGS} -DENABLE_UBSAN=ON"
@@ -113,4 +109,4 @@ done
 [[ -d build ]] || fatal "'build' directory seems to be missing"
 cd build
 
-env CC=/usr/bin/clang-9 CXX=/usr/bin/clang++-9 cmake ${COMPILATION_FLAGS} ${SANITIZER_FLAGS} ..
+env CC=/usr/bin/clang-10 CXX=/usr/bin/clang++-10 cmake ${COMPILATION_FLAGS} ${SANITIZER_FLAGS} ..
