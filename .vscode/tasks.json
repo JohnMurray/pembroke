@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Create Build Dir",
+            "type": "shell",
+            "command": "mkdir -p build",
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
+                "focus": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Conan Install",
+            "type": "shell",
+            "command": "conan install --profile=clang ../pembroke",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "dependsOn": [
+                "Create Build Dir"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

@@ -1,40 +1,108 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+
+# Define image to run all builds/tests under
+executors:
+  docker_ubuntu:
     docker:
       - image: ubuntu:19.10
 
+commands:
+  image_setup:
+    description: 'Setup the container image for all CI runs'
     steps:
       - checkout
-
       - run:
           name: Update APT Repos
           command: apt-get update
+
+      - run:
+          name: Build Tool Setup (clang)
+          command: apt-get install -y clang-9
 
       - run:
           name: Build Tool Setup (python)
           command: apt-get install -y python3 python3-pip && pip3 install -U pip
 
       - run:
-          name: Build Tool Setup (conan)
-          command: pip install conan cmake && conan config get
+          name: Conan Setup & Install 3rd Party Dependencies
+          command: ./.circleci/conan_setup.sh
       
-      - run:
-          name: Conan Install 3rd Party Dependencies
-          command: mkdir build && cd build && conan install ../pembroke --build=missing
-
       - run:
           name: Doc Tools Setup
           command: apt-get install -y doxygen && pip install -U sphinx breathe sphinx_rtd_theme
-      
+  build_pembroke:
+    description: 'Build pembroke'
+    parameters:
+      sanitizer:
+        type: string
+        default: none
+      build_mode:
+        type: string
+        default: debug
+    steps:
       - run:
           name: CMake Setup
-          command: cd build && cmake ..
-      
+          command: ./.circleci/cmake_setup.sh --with-sanitizer '<< parameters.sanitizer >>' --compilation-mode '<< parameters.build_mode >>'
       - run:
-          name: Compile
-          command: cd build && make
-      
+          name: Build Library
+          command: cd build && make -j 2
       - run:
-          name: CTest
+          name: Test Library
           command: cd build && make test
+
+jobs:
+  # Compile and test with all optimizations, do not run with any
+  # sanitizers
+  build:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          build_mode: release
+
+  # ASAN build/test in debug mode
+  test_asan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: asan
+
+  # TSAN build/test in debug mode
+  test_tsan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: tsan
+
+  # MSAN build/test in debug mode
+  test_msan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: msan
+
+  # UBSAN build/test in debug mode
+  test_ubsan:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - build_pembroke:
+          sanitizer: ubsan
+
+
+workflows:
+  version: 2
+  ci_workflow:
+    jobs:
+      - build
+      - test_asan:
+          requires: [build]
+      - test_tsan:
+          requires: [build]
+      - test_msan:
+          requires: [build]
+      - test_ubsan:
+          requires: [build]
