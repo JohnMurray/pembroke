@@ -29,6 +29,7 @@ commands:
       - run:
           name: Doc Tools Setup
           command: apt-get install -y doxygen && pip install -U sphinx breathe sphinx_rtd_theme
+
   build_pembroke:
     description: 'Build pembroke'
     parameters:
@@ -50,6 +51,23 @@ commands:
           command: mkdir -p /tmp/test-out && ./build/pembroke/bin/tests --reporter=junit --out=/tmp/test-out/test-results.xml
       - store_test_results:
           path: /tmp/test-out/
+
+  clang_tidy:
+    description: 'Clang-Tidy Checks'
+    parameters:
+      check_prefix:
+        type: string
+    steps:
+      - run:
+          name: CMake Setup
+          command: ./.circleci/cmake_setup.sh --with-clang-tidy '<< parameters.check_prefix >>'
+      - run:
+          name: Build Library (with checks)
+          command: cd build && cmake --build . -- j2 pembroke
+      - run:
+          name: Build Tests (with checks)
+          command: cd build && cmake --build . -- j2 tests
+        
   build_docs:
     description: 'Build Sphinx Documentation'
     steps:
@@ -96,6 +114,23 @@ jobs:
       - build_pembroke:
           sanitizer: ubsan
   
+  clang_tidy:
+    executor: docker_ubuntu
+    steps:
+      - image_setup
+      - clang_tidy:
+          check_prefix: modernize
+      - clang_tidy:
+          check_prefix: bugprone
+      - clang_tidy:
+          check_prefix: clang-analyzer
+      - clang_tidy:
+          check_prefix: cppcoreguidelines
+      - clang_tidy:
+          check_prefix: performance
+      - clang_tidy:
+          check_prefix: readability
+
   build_docs:
     executor: docker_ubuntu
     steps:
@@ -114,5 +149,7 @@ workflows:
           requires: [build]
       - test_ubsan:
           requires: [build]
+      - clang_tidy:
+          requires: [test_asan, test_tsan, test_ubsan]
       - build_docs:
           requires: [test_asan, test_tsan, test_ubsan]

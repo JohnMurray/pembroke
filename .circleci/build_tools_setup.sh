@@ -9,6 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get install -y --no-install-recommends \
     build-essential  \
     clang-10         \
+    clang-tidy-10    \
     doxygen          \
     libc++-10-dev    \
     curl             \
