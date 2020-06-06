@@ -63,10 +63,10 @@ commands:
           command: ./.circleci/cmake_setup.sh --with-clang-tidy '<< parameters.check_prefix >>'
       - run:
           name: Build Library (with checks)
-          command: cd build && cmake --build . -- j2 pembroke
+          command: cd build && cmake --build . -- -j2 pembroke
       - run:
           name: Build Tests (with checks)
-          command: cd build && cmake --build . -- j2 tests
+          command: cd build && cmake --build . -- -j2 tests
         
   build_docs:
     description: 'Build Sphinx Documentation'
@@ -152,4 +152,4 @@ workflows:
       - clang_tidy:
           requires: [test_asan, test_tsan, test_ubsan]
       - build_docs:
-          requires: [test_asan, test_tsan, test_ubsan]
+          requires: [clang_tidy]
