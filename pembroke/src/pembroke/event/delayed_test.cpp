@@ -18,7 +18,7 @@ TEST_CASE("Schedule zero-wait delayed event", "[event][delayed][execution]") {
     });
     CHECK(r->register_event(event));
 
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 1);
 }
 
@@ -28,11 +28,11 @@ TEST_CASE("Schedule delayed event (blocking)", "[event][delayed][execution]") {
 
     auto event = DelayedEvent(100us, [&]() -> void {
         x += 1;
-        r->stop();
+        CHECK(r->stop());
     });
     CHECK(r->register_event(event));
 
-    r->run_blocking();
+    CHECK(r->run_blocking());
     CHECK(x == 1);
 }
 
@@ -45,12 +45,12 @@ TEST_CASE("Schedule delayed event (non-blocking)", "[event][delayed][execution]"
     });
     CHECK(r->register_event(event));
 
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 0);
 
     std::this_thread::sleep_for(10ms);
 
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 1);
 }
 
@@ -65,7 +65,7 @@ TEST_CASE("Cancel a scheduled, delayed event", "[event][delayed][execution]") {
     CHECK(event.cancel());
 
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 0);
 }
 
@@ -80,6 +80,6 @@ TEST_CASE("Cancel a scheduled, delayed event before registration", "[event][dela
     CHECK_FALSE(r->register_event(event));
 
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 0);
 }

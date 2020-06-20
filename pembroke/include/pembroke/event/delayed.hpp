@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <utility>
 
 #include "pembroke/event.hpp"
 #include "pembroke/libevent/forward_decls.hpp"
@@ -32,22 +33,28 @@ namespace pembroke::event {
          * ``delay``.
          */
         DelayedEvent(duration delay, std::function<void()> callback)
-            : m_delay(delay), m_callback(callback) {}
+            : m_delay(delay), m_callback(std::move(callback)) {}
 
-        ~DelayedEvent();
+        ~DelayedEvent() override;
+
+        DelayedEvent(const DelayedEvent&) = delete;
+        DelayedEvent (DelayedEvent &&event) noexcept;
+
+        auto operator=(const DelayedEvent&) -> DelayedEvent& = delete;
+        auto operator=(DelayedEvent &&event) noexcept -> DelayedEvent&;
 
         [[nodiscard]]
-        bool register_event(event_base &base) noexcept;
+        auto register_event(event_base &base) noexcept -> bool override;
 
         [[nodiscard]]
-        bool cancel() noexcept;
+        auto cancel() noexcept -> bool override;
 
         [[nodiscard]]
-        bool canceled() noexcept;
+        auto canceled() noexcept -> bool override;
 
     private:
         static void run_timer_cb(int, short, void* cb) noexcept;
-        bool close_timer() noexcept;
+        auto close_timer() noexcept -> bool;
     };
 
 } // namespace pembroke::Event

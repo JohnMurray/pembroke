@@ -25,7 +25,7 @@ TEST_CASE("Scheduled no-delay timer", "[event][timer][execution]") {
     });
     CHECK(r->register_event(event));
 
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 1);
 }
 
@@ -36,12 +36,12 @@ TEST_CASE("Scheduled timer event (blocking)", "[event][timer][execution]") {
     auto event = TimerEvent(100us, [&]() -> void {
         x += 1;
         if (x == 3) {
-            r->stop();
+            CHECK(r->stop());
         }
     });
     CHECK(r->register_event(event));
 
-    r->run_blocking();
+    CHECK(r->run_blocking());
     CHECK(x == 3);
 }
 
@@ -54,12 +54,12 @@ TEST_CASE("Schedule timer event (non-blocking)", "[event][delayed][execution]") 
     });
     CHECK(r->register_event(event));
 
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 0);
 
     std::this_thread::sleep_for(10ms);
 
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 1);
 }
 
@@ -74,7 +74,7 @@ TEST_CASE("Cancel a scheduled, delayed timer", "[event][delayed][execution]") {
     CHECK(event.cancel());
 
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 0);
 }
 
@@ -88,11 +88,11 @@ TEST_CASE("Cancel a scheduled, delayed timer after first run", "[event][delayed]
     CHECK(r->register_event(event));
 
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
 
     CHECK(event.cancel());
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
 
     // validate event has not re-registered itself after the
     // callback fires (potentially)
@@ -112,7 +112,7 @@ TEST_CASE("Cancel a scheduled, delayed timer before registration", "[event][dela
     CHECK_FALSE(r->register_event(event));
 
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 0);
     CHECK(event.canceled());
 }

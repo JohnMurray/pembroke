@@ -28,7 +28,7 @@ namespace pembroke {
         b.m_underlying = nullptr;
     }
 
-    Buffer &Buffer::operator=(Buffer &&b) noexcept {
+    auto Buffer::operator=(Buffer &&b) noexcept -> Buffer& {
         if (m_underlying != nullptr) {
             // make sure to free any existing resources
             evbuffer_free(m_underlying);
@@ -44,11 +44,11 @@ namespace pembroke {
     // Buffer Write Methods
     // ---
 
-    void Buffer::add(std::string_view sv) noexcept {
+    auto Buffer::add(std::string_view str_view) noexcept -> void {
         if (m_underlying == nullptr) {
             return;
         }
-        evbuffer_add(m_underlying, sv.data(), sv.length());
+        evbuffer_add(m_underlying, str_view.data(), str_view.length());
     }
 
     void Buffer::add(const char *c_str, size_t n_chars) noexcept {
@@ -74,18 +74,18 @@ namespace pembroke {
     // Buffer Read Methods
     // ---
 
-    size_t Buffer::length() noexcept {
+    auto Buffer::length() noexcept -> size_t {
         if (m_underlying == nullptr) {
             return 0;
         }
         return evbuffer_get_length(m_underlying);
     }
 
-    size_t Buffer::size() noexcept {
+    auto Buffer::size() noexcept -> size_t {
         return length();
     }
 
-    std::string_view Buffer::view_str() noexcept {
+    auto Buffer::view_str() noexcept -> std::string_view {
         if (m_underlying == nullptr) {
             return std::string_view();
         }
@@ -96,7 +96,7 @@ namespace pembroke {
         return std::string_view(reinterpret_cast<char *>(data), len);
     }
 
-    std::string Buffer::str() noexcept {
+    auto Buffer::str() noexcept -> std::string {
         if (m_underlying == nullptr) {
             return std::string();
         }
@@ -107,7 +107,7 @@ namespace pembroke {
         return std::string(reinterpret_cast<char *>(data), len);
     }
 
-    ByteSlice Buffer::bytes() const noexcept {
+    auto Buffer::bytes() const noexcept -> ByteSlice {
         if (m_underlying == nullptr) {
             return ByteSlice{nullptr, 0};
         }

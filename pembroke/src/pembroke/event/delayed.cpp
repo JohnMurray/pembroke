@@ -13,9 +13,27 @@ namespace pembroke::event {
         close_timer();
     }
 
+    DelayedEvent::DelayedEvent(DelayedEvent &&event) noexcept 
+        : m_delay(event.m_delay),
+          m_callback(std::move(event.m_callback)),
+          m_timer_event(event.m_timer_event),
+          m_canceled(event.m_canceled) {
+        event.m_timer_event = nullptr;
+    }
+
+    auto DelayedEvent::operator=(DelayedEvent &&event) noexcept -> DelayedEvent& {
+        m_delay = event.m_delay;
+        m_callback = std::move(event.m_callback);
+        m_timer_event = event.m_timer_event;
+        m_canceled = event.m_canceled;
+
+        event.m_timer_event = nullptr;
+        return *this;
+    }
+
 
     [[nodiscard]]
-    bool DelayedEvent::register_event(event_base &base) noexcept {
+    auto DelayedEvent::register_event(event_base &base) noexcept -> bool {
         // If we have canceled before registration, fail registration
         if (m_canceled) {
             pembroke::logger::warn("Attempting to register cancled timer-event");
@@ -35,15 +53,15 @@ namespace pembroke::event {
         return ret == 0;
     }
 
-    bool DelayedEvent::cancel() noexcept {
+    auto DelayedEvent::cancel() noexcept -> bool {
         return close_timer();
     }
 
-    bool DelayedEvent::canceled() noexcept {
+    auto DelayedEvent::canceled() noexcept -> bool {
         return m_canceled;
     }
 
-    bool DelayedEvent::close_timer() noexcept {
+    auto DelayedEvent::close_timer() noexcept -> bool {
         bool ret = true;
         if (m_timer_event != nullptr) {
             ret = evtimer_del(m_timer_event) == 0;
@@ -57,9 +75,9 @@ namespace pembroke::event {
         return ret;
     }
 
-    void DelayedEvent::run_timer_cb(int, short, void* cb) noexcept {
+    void DelayedEvent::run_timer_cb(int /*unused*/, short /*unused*/, void* cb) noexcept {
         ASSERT_RELEASE(cb != nullptr, "Timer event called with null timer object");
-        auto self = static_cast<DelayedEvent *>(cb);
+        auto *self = static_cast<DelayedEvent *>(cb);
         if (self->m_timer_event != nullptr) {
             self->m_callback();
             self->close_timer();

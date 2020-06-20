@@ -9,11 +9,11 @@ namespace pembroke::logger {
      * functions are not suitable for application/user-specific logic.
      */
 
-    void trace(const std::string_view msg);
-    void debug(const std::string_view msg);
-    void info(const std::string_view msg);
-    void warn(const std::string_view msg);
-    void error(const std::string_view msg);
-    void crit(const std::string_view msg);
+    void trace(std::string_view msg);
+    void debug(std::string_view msg);
+    void info(std::string_view msg);
+    void warn(std::string_view msg);
+    void error(std::string_view msg);
+    void crit(std::string_view msg);
 
 } // namespace pembroke::logger

@@ -13,9 +13,31 @@ namespace pembroke::event {
         close_timer();
     }
 
+    TimerEvent::TimerEvent (TimerEvent &&event) noexcept
+        : m_initial_delay(event.m_initial_delay),
+          m_interval(event.m_interval),
+          m_callback(std::move(event.m_callback)),
+          m_timer_event(event.m_timer_event),
+          m_canceled(event.m_canceled),
+          m_first_run(event.m_first_run) {
+
+        event.m_timer_event = nullptr;
+    }
+
+    auto TimerEvent::operator=(TimerEvent &&event) noexcept -> TimerEvent& {
+        m_initial_delay = event.m_initial_delay;
+        m_interval = event.m_interval;
+        m_callback = std::move(event.m_callback);
+        m_timer_event = event.m_timer_event;
+        m_canceled = event.m_canceled;
+        m_first_run = event.m_first_run;
+
+        event.m_timer_event = nullptr;
+        return *this;
+    }
 
     [[nodiscard]]
-    bool TimerEvent::register_event(event_base &base) noexcept {
+    auto TimerEvent::register_event(event_base &base) noexcept -> bool {
         // If we have canceled before registration, fail registration
         if (m_canceled) {
             pembroke::logger::warn("Attempting to register cancled timer-event");
@@ -35,16 +57,16 @@ namespace pembroke::event {
         return ret == 0;
     }
 
-    bool TimerEvent::cancel() noexcept {
+    auto TimerEvent::cancel() noexcept -> bool {
         m_canceled = true;
         return close_timer();
     }
 
-    bool TimerEvent::canceled() noexcept {
+    auto TimerEvent::canceled() noexcept -> bool {
         return m_canceled;
     }
 
-    bool TimerEvent::close_timer() noexcept {
+    auto TimerEvent::close_timer() noexcept -> bool {
         bool ret = true;
         if (m_timer_event != nullptr) {
             ret = evtimer_del(m_timer_event) == 0;
@@ -54,9 +76,9 @@ namespace pembroke::event {
         return ret;
     }
 
-    void TimerEvent::run_timer_cb(int, short, void* cb) noexcept {
+    void TimerEvent::run_timer_cb(int /*unused*/, short /*unused*/, void* cb) noexcept {
         ASSERT_RELEASE(cb != nullptr, "Timer event called with null timer object");
-        auto self = static_cast<TimerEvent *>(cb);
+        auto *self = static_cast<TimerEvent *>(cb);
         if (self->m_canceled) {
             // cleanup should have already been taken care of, so just
             // exit early and avoid any sort of re-registering logic

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <utility>
 
 #include "pembroke/event.hpp"
 #include "pembroke/libevent/forward_decls.hpp"
@@ -46,29 +47,35 @@ namespace pembroke::event {
          * every ``interval``.
          */
         TimerEvent(duration interval, std::function<void()> callback)
-            : m_interval(interval), m_callback(callback), m_initial_delay(no_delay) {}
+            : m_interval(interval), m_callback(std::move(callback)), m_initial_delay(no_delay) {}
 
         /**
          * @brief Construct a timer that execute ``callback`` after an initial duration of
          * ``initial_delay` and then every ``interval``.
          */
         TimerEvent(duration initial_delay, duration interval, std::function<void()> callback)
-            : m_interval(interval), m_initial_delay(initial_delay), m_callback(callback) {}
+            : m_interval(interval), m_initial_delay(initial_delay), m_callback(std::move(callback)) {}
 
-        ~TimerEvent();
+        ~TimerEvent() override;
+
+        TimerEvent(const TimerEvent&) = delete;
+        TimerEvent (TimerEvent &&event) noexcept;
+
+        auto operator=(const TimerEvent&) -> TimerEvent& = delete;
+        auto operator=(TimerEvent &&event) noexcept -> TimerEvent&;
 
         [[nodiscard]]
-        bool register_event(event_base &base) noexcept;
+        auto register_event(event_base &base) noexcept -> bool override;
 
         [[nodiscard]]
-        bool cancel() noexcept;
+        auto cancel() noexcept -> bool override;
 
         [[nodiscard]]
-        bool canceled() noexcept;
+        auto canceled() noexcept -> bool override;
 
     private:
         static void run_timer_cb(int, short, void* cb) noexcept;
-        bool close_timer() noexcept;
+        auto close_timer() noexcept -> bool;
     };
 
 } // namespace pembroke::Event

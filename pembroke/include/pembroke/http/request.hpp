@@ -27,8 +27,8 @@ namespace pembroke::http {
         ConstRequest(const ConstRequest &r) = delete;
         ConstRequest(ConstRequest &&r) noexcept;
 
-        ConstRequest &operator=(const ConstRequest &other) = delete;
-        ConstRequest &operator=(ConstRequest &&other) noexcept;
+        auto operator=(const ConstRequest &other) -> ConstRequest & = delete;
+        auto operator=(ConstRequest &&other) noexcept -> ConstRequest &;
 
         // TODO: Body functions
         // TODO: Header functions

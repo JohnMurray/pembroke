@@ -19,10 +19,10 @@
 namespace pembroke {
 
     [[nodiscard]]
-    std::tuple<
+    auto test_stream_logger() noexcept -> std::tuple<
         std::function<void(logger::Level l, std::string_view msg)>,
         std::shared_ptr<std::unordered_map<logger::Level, std::stringstream>>
-    > test_stream_logger() noexcept;
+    >;
 
     void trample_stack() noexcept;
 

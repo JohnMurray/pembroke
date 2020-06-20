@@ -1,0 +1,11 @@
+Checks:           'modernize-*,
+                   bugprone-*,
+                   clang-analyzer-*,
+                   cppcoreguidelines-*,
+                   performance-*,
+                   readability-*'
+CheckOptions:
+    - key:      cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+      value:    1
+    - key:      cppcoreguidelines-macro-usage.AllowedRegexp
+      value     '^ASSERT_'

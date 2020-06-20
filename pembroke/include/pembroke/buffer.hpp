@@ -42,13 +42,13 @@ namespace pembroke {
 
         /** @brief Move-assign a buffer-object. The underlying `evbuffer` will be transferred
          *         into the newly constructed class. */
-        Buffer &operator=(Buffer &&) noexcept;
+        auto operator=(Buffer &&) noexcept -> Buffer &;
 
         /* Remove implicit buffer copies. Copying a buffer is often _not_
          * what a user wants to do. Instead make this explicit by forcing
          * them to call `copy()` */
         Buffer(const Buffer &) = delete;
-        Buffer &operator=(const Buffer &) = delete;
+        auto operator=(const Buffer &) -> Buffer & = delete;
 
 
         // ---
@@ -118,19 +118,19 @@ namespace pembroke {
          * @brief Return the length of the data currently stored in the buffer. Same as Buffer::size().
          */
         [[nodiscard]]
-        size_t length() noexcept;
+        auto length() noexcept -> size_t;
 
         /**
          * @brief Return the length of the data currently stored in the buffer. Same as Buffer::length().
          */
         [[nodiscard]]
-        size_t size() noexcept;
+        auto size() noexcept -> size_t;
 
         /**
          * @brief Return a string-view into the buffer.
          */
         [[nodiscard]]
-        std::string_view view_str() noexcept;
+        auto view_str() noexcept -> std::string_view;
 
         /**
          * @brief Return a `std::string` of the buffer contents. Note that this @b will perform
@@ -138,13 +138,13 @@ namespace pembroke {
          *        or Buffer::bytes() methods.
          */
         [[nodiscard]]
-        std::string str() noexcept;
+        auto str() noexcept -> std::string;
 
         /**
          * @brief Return a ByteSlice of the buffer. No copies of the underlying buffer-data are performed.
          */
         [[nodiscard]]
-        ByteSlice bytes() const noexcept;
+        auto bytes() const noexcept -> ByteSlice;
     };
 
     /**

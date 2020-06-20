@@ -7,7 +7,7 @@ namespace pembroke::logger {
      * @brief Global log handler (default initialized to a no_op handler)
      */
     static std::function<void(Level, std::string_view)> _log_handler = 
-        [](Level, std::string_view) -> void {};
+        [](Level /*unused*/, std::string_view /*unused*/) -> void {};
 
     void register_handler(const std::function<void(Level, std::string_view)> &f) {
         _log_handler = f;

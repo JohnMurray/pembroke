@@ -18,31 +18,31 @@ namespace pembroke {
     // REACTOR CONFIGURATION / BUILDER CODE
     // ---
 
-    ReactorBuilder reactor() noexcept {
+    auto reactor() noexcept -> ReactorBuilder {
         return ReactorBuilder{};
     }
 
-    ReactorBuilder &ReactorBuilder::require_edge_trigger_support(bool val) noexcept {
+    auto ReactorBuilder::require_edge_trigger_support(bool val) noexcept -> ReactorBuilder & {
         m_require_edge_triggering = val;
         return *this;
     }
 
-    ReactorBuilder &ReactorBuilder::require_file_descriptor_support(bool val) noexcept {
+    auto ReactorBuilder::require_file_descriptor_support(bool val) noexcept -> ReactorBuilder & {
         m_require_file_descriptor = val;
         return *this;
     }
 
-    ReactorBuilder &ReactorBuilder::require_early_close_support(bool val) noexcept {
+    auto ReactorBuilder::require_early_close_support(bool val) noexcept -> ReactorBuilder & {
         m_require_early_close = val;
         return *this;
     }
 
-    ReactorBuilder &ReactorBuilder::require_order_one_trigger_support(bool val) noexcept {
+    auto ReactorBuilder::require_order_one_trigger_support(bool val) noexcept -> ReactorBuilder & {
         m_require_order_one_trigger = val;
         return *this;
     }
 
-    std::unique_ptr<Reactor> ReactorBuilder::build() const noexcept {
+    auto ReactorBuilder::build() const noexcept -> std::unique_ptr<Reactor> {
         return std::make_unique<Reactor>(*this);
     }
 
@@ -54,7 +54,7 @@ namespace pembroke {
         auto config = std::unique_ptr<
             event_config,
             decltype(event_config_free) *>(event_config_new(), event_config_free);
-        int ret;
+        int ret = 0;
 
         if (builder.m_require_edge_triggering) {
             ret = event_config_require_features(config.get(), EV_FEATURE_ET);
@@ -88,15 +88,15 @@ namespace pembroke {
         }
     }
 
-    bool Reactor::run_blocking() const noexcept {
+    auto Reactor::run_blocking() const noexcept -> bool {
         return event_base_loop(m_base.get(), EVLOOP_NO_EXIT_ON_EMPTY) == LOOP_RAN_SUCCESSFULLY;
     }
 
-    bool Reactor::stop() const noexcept {
+    auto Reactor::stop() const noexcept -> bool {
         return event_base_loopbreak(m_base.get()) == LOOP_BREAK_SUCCESS;
     }
 
-    bool Reactor::tick() const noexcept {
+    auto Reactor::tick() const noexcept -> bool {
         if (event_base_get_num_events(m_base.get(), EVENT_BASE_COUNT_ACTIVE) > 0) {
             /* If we know we have active events, pass EVLOOP_ONCE to ensure
              * that we're waiting for current active events to finish and run
@@ -105,12 +105,11 @@ namespace pembroke {
         }
         /* If we don't have any active events, still run the loop, but run with
          * EVLOOP_NONBLOCK, which will not block until any events are active. */
-        int ret;
-        ret = event_base_loop(m_base.get(), EVLOOP_NONBLOCK);
+        int ret = event_base_loop(m_base.get(), EVLOOP_NONBLOCK);
         return (ret == LOOP_RAN_NO_EVENTS) || (ret == LOOP_RAN_SUCCESSFULLY);
     }
 
-    bool Reactor::tick_fast() const noexcept {
+    auto Reactor::tick_fast() const noexcept -> bool {
         /* Use EVLOOP_NONBLOCK to only execute callbacks for high-priority,
          * ready events */
         int ret = event_base_loop(m_base.get(), EVLOOP_NONBLOCK);
@@ -118,7 +117,7 @@ namespace pembroke {
     }
 
     
-    bool Reactor::register_event(pembroke::Event &event) noexcept {
+    auto Reactor::register_event(pembroke::Event &event) noexcept -> bool {
         return event.register_event(*m_base);
     }
 
