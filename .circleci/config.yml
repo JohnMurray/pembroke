@@ -64,9 +64,6 @@ commands:
       - run:
           name: Build Library (with checks)
           command: cd build && cmake --build . -- -j2 pembroke
-      - run:
-          name: Build Tests (with checks)
-          command: cd build && cmake --build . -- -j2 tests
         
   build_docs:
     description: 'Build Sphinx Documentation'
