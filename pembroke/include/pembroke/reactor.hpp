@@ -45,8 +45,8 @@ namespace pembroke {
         Reactor(const Reactor &r) = delete;
         Reactor(Reactor &&r) = delete;
 
-        Reactor &operator=(const Reactor &r) = delete;
-        Reactor &operator=(Reactor &&r) = delete;
+        auto operator=(const Reactor &r) -> Reactor & = delete;
+        auto operator=(Reactor &&r) -> Reactor & = delete;
 
         /**
          * @brief Run the reactor in a blocking fashion and do not exit.
@@ -56,7 +56,8 @@ namespace pembroke {
          * @see pause()
          * @returns True if the loop ran successfully, False otherwise
          */
-        bool run_blocking() const noexcept;
+        [[nodiscard]]
+        auto run_blocking() const noexcept -> bool;
 
         /**
          * @brief Run the event-loop once. If there are no active events then this mehtod will
@@ -67,7 +68,8 @@ namespace pembroke {
          * @see tick_fast()
          * @returns True if the loop ran successfully, False otherwise
          */
-        bool tick() const noexcept;
+        [[nodiscard]]
+        auto tick() const noexcept -> bool;
 
         /**
          * @brief Run the event-loop once, much like tick(). However this function will only execute
@@ -77,7 +79,8 @@ namespace pembroke {
          * @see tick()
          * @returns True if the loop ran successfully, False otherwise
          */
-        bool tick_fast() const noexcept;
+        [[nodiscard]]
+        auto tick_fast() const noexcept -> bool;
 
         /**
          * @brief Stop the reactor, returning control to the portion of code that invoked the blocking
@@ -87,11 +90,12 @@ namespace pembroke {
          * @return True if the reactor was successfully stopped (or if the reactor was not runnig), False
          *         if an error was encountered while attempting to stop.
          */
-        bool stop() const noexcept;
+        [[nodiscard]]
+        auto stop() const noexcept -> bool;
 
 
         [[nodiscard]]
-        bool register_event(pembroke::Event &event) noexcept;
+        auto register_event(pembroke::Event &event) noexcept -> bool;
     };
 
     /** 
@@ -99,7 +103,7 @@ namespace pembroke {
      * @see ReactorBuilder
      */
     struct ConfigurationException: public std::runtime_error {
-        ConfigurationException(const char *what) throw(): std::runtime_error(what){}
+        ConfigurationException(const char *what) : std::runtime_error(what){}
     };
 
     /**
@@ -113,13 +117,13 @@ namespace pembroke {
         bool m_require_early_close = false;
         bool m_require_order_one_trigger = false;
 
-        ReactorBuilder &require_edge_trigger_support(bool val = true) noexcept;
-        ReactorBuilder &require_file_descriptor_support(bool val = true) noexcept;
-        ReactorBuilder &require_early_close_support(bool val = true) noexcept;
-        ReactorBuilder &require_order_one_trigger_support(bool val = true) noexcept;
+        auto require_edge_trigger_support(bool val = true) noexcept -> ReactorBuilder &;
+        auto require_file_descriptor_support(bool val = true) noexcept -> ReactorBuilder &;
+        auto require_early_close_support(bool val = true) noexcept -> ReactorBuilder &;
+        auto require_order_one_trigger_support(bool val = true) noexcept -> ReactorBuilder &;
 
         [[nodiscard]]
-        std::unique_ptr<Reactor> build() const noexcept;
+        auto build() const noexcept -> std::unique_ptr<Reactor>;
     };
 
     /**
@@ -133,5 +137,5 @@ namespace pembroke {
      * @returns A `ReactorBuilder` object
      */
     [[nodiscard]]
-    ReactorBuilder reactor() noexcept;
+    auto reactor() noexcept -> ReactorBuilder;
 } // namespace pembroke

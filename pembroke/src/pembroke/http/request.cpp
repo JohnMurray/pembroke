@@ -23,7 +23,7 @@ namespace pembroke::http {
         other.m_req = nullptr;
     }
 
-    ConstRequest &ConstRequest::operator=(ConstRequest &&other) noexcept {
+    auto ConstRequest::operator=(ConstRequest &&other) noexcept -> ConstRequest& {
         this->m_req = other.m_req;
         other.m_req = nullptr;
         return *this;

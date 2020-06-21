@@ -2,13 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Create Build Dir",
+            "label": "__private::create_build_dir",
             "type": "shell",
             "command": "mkdir -p build",
             "presentation": {
                 "echo": false,
                 "reveal": "silent",
-                "focus": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+        },
+        {
+            "label": "__private::clean_build_dir",
+            "type": "shell",
+            "command": "rm -rf build/",
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
             },
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -17,22 +28,29 @@
         {
             "label": "Conan Install",
             "type": "shell",
-            "command": "conan install --profile=clang ../pembroke",
+            "command": "conan install --profile=clang ../pembroke --build=missing",
             "options": {
                 "cwd": "${workspaceFolder}/build"
             },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+            "dependsOn": [
+                "__private::create_build_dir"
+            ]
+        },
+        {
+            "label": "CMake Init",
+            "type": "shell",
+            "command": "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..",
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+                "env": {
+                    "CC": "clang",
+                    "CXX": "clang++"
+                }
             },
             "dependsOn": [
-                "Create Build Dir"
-            ],
-            "problemMatcher": []
+                "__private::clean_build_dir",
+                "Conan Install"
+            ]
         }
     ]
 }

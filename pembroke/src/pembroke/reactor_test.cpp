@@ -72,9 +72,11 @@ TEST_CASE("Reactor cannot be moved", "[reactor][construction]") {
 // No-Op Execution
 // ---
 
+static constexpr int ReactorIterations = 10;
+
 TEST_CASE("Reactor runs with no scheduled events", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < ReactorIterations; i++) {
         REQUIRE_NOTHROW(r->tick());
         REQUIRE_NOTHROW(r->tick_fast());
     }
@@ -83,7 +85,7 @@ TEST_CASE("Reactor runs with no scheduled events", "[reactor][execution]") {
 TEST_CASE("Reactor ticks after post-run-stop", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < ReactorIterations; i++) {
         CHECK(r->tick());
         CHECK(r->stop());
     }
@@ -91,9 +93,9 @@ TEST_CASE("Reactor ticks after post-run-stop", "[reactor][execution]") {
 
 TEST_CASE("Reactor stops post-run, repeatedly", "[reactor][execution]") {
     auto r = pembroke::reactor().build();
-    r->tick();
+    CHECK(r->tick());
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < ReactorIterations; i++) {
         CHECK(r->stop());
     }
 }
@@ -108,7 +110,7 @@ TEST_CASE("Stop. Do not execute pending tasks", "[reactor][execution]") {
 
     auto t1 = DelayedEvent(10us, [&]() -> void { 
         x += 1;
-        r->stop();
+        CHECK(r->stop());
     });
     auto t2 = DelayedEvent(100us, [&]() -> void { x += 1; });
     auto t3 = DelayedEvent(100us, [&]() -> void { x += 1; });
@@ -120,7 +122,7 @@ TEST_CASE("Stop. Do not execute pending tasks", "[reactor][execution]") {
     CHECK(r->register_event(t4));
 
     std::this_thread::sleep_for(10ms);
-    r->run_blocking();
+    CHECK(r->run_blocking());
     CHECK(x == 1);
 }
 
@@ -130,7 +132,7 @@ TEST_CASE("Resume and execute pending tasks", "[reactor][execution]") {
 
     auto t1 = DelayedEvent(0us, [&]() -> void { 
         x += 1;
-        r->stop();
+        CHECK(r->stop());
     });
     auto t2 = DelayedEvent(100us, [&]() -> void { x += 1; });
     auto t3 = DelayedEvent(100us, [&]() -> void { x += 1; });
@@ -141,9 +143,9 @@ TEST_CASE("Resume and execute pending tasks", "[reactor][execution]") {
     CHECK(r->register_event(t3));
     CHECK(r->register_event(t4));
 
-    r->run_blocking();
+    CHECK(r->run_blocking());
     std::this_thread::sleep_for(10ms);
-    r->tick();
+    CHECK(r->tick());
     CHECK(x == 4);
 }
 
@@ -157,7 +159,7 @@ TEST_CASE("Schedule events while paused, execute on resumption", "[reactor][exec
 
     auto t1 = DelayedEvent(0us, [&]() -> void { 
         x += 1;
-        r->stop();
+        CHECK(r->stop());
         t2 = std::make_shared<DelayedEvent>(0us, [&]() -> void { x += 1; });
         t3 = std::make_shared<DelayedEvent>(0us, [&]() -> void { x += 1; });
         t4 = std::make_shared<DelayedEvent>(0us, [&]() -> void { x += 1; });
@@ -168,7 +170,6 @@ TEST_CASE("Schedule events while paused, execute on resumption", "[reactor][exec
     });
     CHECK(r->register_event(t1));
 
-    r->tick(); // stopped on first tick
-    r->tick(); // execute events schedule post-stop
-    CHECK(x == 4);
+    CHECK(r->tick()); // stopped on first tick
+    CHECK(r->tick()); // execute events schedule post-stop CHECK(x == 4);
 }

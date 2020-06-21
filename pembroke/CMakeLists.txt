@@ -9,15 +9,11 @@ conan_basic_setup()
 ## Sanatizer Setup
 ## 
 option(ENABLE_ASAN  "Enable address sanitizer"            OFF)
-option(ENABLE_MSAN  "Enable memory sanitizer"             OFF)
 option(ENABLE_TSAN  "Enable thread sanitizer"             OFF)
 option(ENABLE_UBSAN "Enable undefined behavior sanitizer" OFF)
 
 if (ENABLE_ASAN)
     include(asan)
-endif()
-if (ENABLE_MSAN)
-    include(msan)
 endif()
 if (ENABLE_TSAN)
     include(tsan)

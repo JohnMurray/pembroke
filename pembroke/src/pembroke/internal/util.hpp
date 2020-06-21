@@ -8,6 +8,8 @@ extern "C" {
 #include <sys/time.h>
 }
 
+#include "pembroke/internal/logging.hpp"
+
 /*
  * This file defines some common utilities that are useful to pembroke
  * but aren't genearlly useful outside of this library or at least aren't
@@ -23,7 +25,7 @@ namespace pembroke::internal {
      * @returns A timeval struct by value
      */
     template<typename T>
-    timeval to_timeval(const std::chrono::duration<long, T> &cd) {
+    auto to_timeval(const std::chrono::duration<long, T> &cd) -> timeval {
         std::chrono::duration<long, std::micro> micros =
             std::chrono::duration_cast<std::chrono::microseconds>(cd);
         return to_timeval(micros);
@@ -35,7 +37,7 @@ namespace pembroke::internal {
      * @returns A timeval struct by value
      */
     template<>
-    timeval to_timeval(const std::chrono::duration<long, std::micro> &cd);
+    auto to_timeval(const std::chrono::duration<long, std::micro> &cd) -> timeval;
 
 }  // namespace pembroke::internal
 

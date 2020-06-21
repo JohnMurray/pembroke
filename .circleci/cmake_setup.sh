@@ -26,6 +26,7 @@ function info() { local msg=$1;
 
 SANITIZER_FLAGS=''
 COMPILATION_FLAGS=''
+CLANG_TIDY_FLAGS=''
 
 function set_sanitizer_flags() { local sanitizer=$1;
     case "$sanitizer" in
@@ -36,10 +37,6 @@ function set_sanitizer_flags() { local sanitizer=$1;
         tsan)
             info "Running test with TSAN support"
             SANITIZER_FLAGS="${SANITIZER_FLAGS} -DENABLE_TSAN=ON"
-            ;;
-        msan)
-            info "Running test with MSAN support"
-            SANITIZER_FLAGS="${SANITIZER_FLAGS} -DENABLE_MSAN=ON"
             ;;
         ubsan)
             info "Running test with UBSAN support"
@@ -68,6 +65,12 @@ function set_compilation_mode_flags() { local mode=$1;
     esac
 }
 
+function set_clang_tidy_flags() { local check=$1;
+    local tidy;
+    tidy=$(which clang-tidy-10)
+    CLANG_TIDY_FLAGS="-DCMAKE_CXX_CLANG_TIDY=${tidy};-checks=${check}-*;--warnings-as-errors=${check}-*"
+}
+
 function print_help() {
     cat <<EOF
 $(basename $0) [options]
@@ -77,6 +80,8 @@ Setup CMake for CircleCI builds
 OPTIONS
     -s | --with-sanitizer    Set sanitizer to one of [asan, tsan, msan, ubsan]
     -c | --compilation-mode  Set compilation mode to one of [debug, release]
+    -t | --with-clang-tidy   Set clang-tidy check prefix (will not run tidy if
+                             flag is not provided)
     -h | --help              Show this help-message
 
 EOF
@@ -92,6 +97,11 @@ while (( "$#" )); do
         -c|--compilation-mode)
             [[ -z "$2" ]] && fatal "Must provide argument for '--compilation-mode' flag"
             set_compilation_mode_flags "$2"
+            shift 2
+            ;;
+        -t|--with-clang-tidy)
+            [[ -z "$2" ]] && fatal "Must provide argument for '--with-clang-tidy' flag"
+            set_clang_tidy_flags "$2"
             shift 2
             ;;
         -h|--help|help)
@@ -113,4 +123,9 @@ done
 [[ -d build ]] || fatal "'build' directory seems to be missing"
 cd build
 
-env CC=/usr/bin/clang-9 CXX=/usr/bin/clang++-9 cmake ${COMPILATION_FLAGS} ${SANITIZER_FLAGS} ..
+# shellcheck disable=SC2086
+env CC=/usr/bin/clang-10 CXX=/usr/bin/clang++-10 cmake \
+    $COMPILATION_FLAGS                                \
+    $SANITIZER_FLAGS                                  \
+    $CLANG_TIDY_FLAGS                                  \
+    ..

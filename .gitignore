@@ -2,6 +2,8 @@
 .vscode/
 *.swp
 .idea/
+compile_commands.json
+.clangd/
 
 # Build Artifacts/Directories
 build/
